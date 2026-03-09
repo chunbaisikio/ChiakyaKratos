@@ -108,71 +108,96 @@ layout: page
 </div>
 
 <script>
-(function() {
-  let currentYear = new Date().getFullYear();
-  let currentMonth = new Date().getMonth();
-  let animeList = JSON.parse(localStorage.getItem('animeList')) || [];
-  
-  function init() {
-    generateCalendar();
-    setupEventListeners();
+  var currentYear = new Date().getFullYear();
+  var currentMonth = new Date().getMonth();
+  var animeList = [];
+
+  function initCalendar() {
+    loadAnimeList();
+    renderCalendar();
+    renderCurrentMonth();
+    
+    document.getElementById('weekly-mode-btn').onclick = function() {
+      switchMode('weekly');
+    };
+    
+    document.getElementById('range-mode-btn').onclick = function() {
+      switchMode('range');
+    };
+    
+    document.getElementById('add-weekly-btn').onclick = addWeeklyAnime;
+    
+    document.getElementById('add-range-btn').onclick = addRangeAnime;
+    
+    document.getElementById('prev-month').onclick = function() {
+      changeMonth(-1);
+    };
+    
+    document.getElementById('next-month').onclick = function() {
+      changeMonth(1);
+    };
   }
-  
-  function generateCalendar() {
-    const container = document.getElementById('calendar-container');
+
+  function loadAnimeList() {
+    var stored = localStorage.getItem('animeList');
+    if (stored) {
+      animeList = JSON.parse(stored);
+    }
+  }
+
+  function renderCurrentMonth() {
+    var monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    document.getElementById('current-month').innerHTML = currentYear + '年' + monthNames[currentMonth];
+  }
+
+  function renderCalendar() {
+    var container = document.getElementById('calendar-container');
     if (!container) return;
-    
-    let html = '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
-    
+
+    var html = '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
     html += '<thead><tr>';
-    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    weekdays.forEach(day => {
-      html += '<th style="padding: 10px; background-color: #4CAF50; color: white; text-align: center; font-weight: bold; border: 1px solid #ddd;">' + day + '</th>';
-    });
+    var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    for (var i = 0; i < weekdays.length; i++) {
+      html += '<th style="padding: 10px; background-color: #4CAF50; color: white; text-align: center; font-weight: bold; border: 1px solid #ddd;">' + weekdays[i] + '</th>';
+    }
     html += '</tr></thead>';
-    
     html += '<tbody>';
-    
-    const firstDay = new Date(currentYear, currentMonth, 1);
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-    const startDayOfWeek = firstDay.getDay();
-    
-    const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
-    let dayCount = 1;
-    let nextMonthDay = 1;
-    
-    const today = new Date();
-    
-    for (let week = 0; week < 6; week++) {
+
+    var firstDay = new Date(currentYear, currentMonth, 1);
+    var lastDay = new Date(currentYear, currentMonth + 1, 0);
+    var startDayOfWeek = firstDay.getDay();
+    var prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
+    var dayCount = 1;
+    var nextMonthDay = 1;
+    var today = new Date();
+
+    for (var week = 0; week < 6; week++) {
       html += '<tr>';
-      
-      for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-        const cellIndex = week * 7 + dayOfWeek;
-        
+      for (var dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+        var cellIndex = week * 7 + dayOfWeek;
         if (cellIndex < startDayOfWeek) {
-          const day = prevMonthLastDay - startDayOfWeek + cellIndex + 1;
+          var day = prevMonthLastDay - startDayOfWeek + cellIndex + 1;
           html += '<td style="padding: 10px; border: 1px solid #e0e0e0; background-color: #f0f0f0; opacity: 0.5; min-height: 80px; vertical-align: top;">';
           html += '<div style="font-size: 14px; color: #999; margin-bottom: 5px;">' + day + '</div>';
           html += '</td>';
         } else if (dayCount <= lastDay.getDate()) {
-          const isToday = today.getFullYear() === currentYear && 
-                          today.getMonth() === currentMonth && 
-                          today.getDate() === dayCount;
-          const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-          
-          html += '<td style="padding: 10px; border: 1px solid #e0e0e0; background-color: ' + (isWeekend ? '#f0f8ff' : '#f9f9f9') + '; ' + (isToday ? 'border: 2px solid #4CAF50;' : '') + ' min-height: 80px; vertical-align: top;">';
+          var isToday = today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === dayCount;
+          var isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+          var bgColor = isWeekend ? '#f0f8ff' : '#f9f9f9';
+          var borderStyle = isToday ? 'border: 2px solid #4CAF50;' : '';
+          html += '<td style="padding: 10px; border: 1px solid #e0e0e0; background-color: ' + bgColor + '; ' + borderStyle + ' min-height: 80px; vertical-align: top;">';
           html += '<div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 5px;">' + dayCount + '</div>';
-          
-          const date = new Date(currentYear, currentMonth, dayCount);
-          const dayAnimes = getAnimesForDate(date);
-          
-          dayAnimes.forEach(anime => {
-            const colorMap = { japanese: '#ff6b6b', korean: '#4ecdc4', chinese: '#45b7d1' };
+
+          var date = new Date(currentYear, currentMonth, dayCount);
+          var dayAnimes = getAnimesForDate(date);
+          for (var j = 0; j < dayAnimes.length; j++) {
+            var anime = dayAnimes[j];
+            var colorMap = { japanese: '#ff6b6b', korean: '#4ecdc4', chinese: '#45b7d1' };
             html += '<div style="background-color: #fff; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 3px solid ' + colorMap[anime.type] + ';" onclick="showAnimeDetail(\'' + anime.id + '\')">';
             html += anime.title + '<br><small>' + anime.time + '</small>';
             html += '</div>';
-          });
-          
+          }
           html += '</td>';
           dayCount++;
         } else {
@@ -182,174 +207,165 @@ layout: page
           nextMonthDay++;
         }
       }
-      
       html += '</tr>';
-      
       if (dayCount > lastDay.getDate()) break;
     }
-    
     html += '</tbody></table>';
-    
     container.innerHTML = html;
-    
-    const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-    document.getElementById('current-month').textContent = currentYear + '年' + monthNames[currentMonth];
   }
-  
+
   function getAnimesForDate(date) {
-    const dateStr = formatDate(date);
-    const dayOfWeek = date.getDay();
-    
-    return animeList.filter(anime => {
+    var dateStr = formatDate(date);
+    var dayOfWeek = date.getDay();
+    var result = [];
+    for (var i = 0; i < animeList.length; i++) {
+      var anime = animeList[i];
       if (anime.mode === 'weekly') {
-        if (anime.dayOfWeek !== dayOfWeek) return false;
-        if (anime.startDate && dateStr < anime.startDate) return false;
-        if (anime.endDate && dateStr > anime.endDate) return false;
-        return true;
+        if (anime.dayOfWeek !== dayOfWeek) continue;
+        if (anime.startDate && dateStr < anime.startDate) continue;
+        if (anime.endDate && dateStr > anime.endDate) continue;
+        result.push(anime);
       } else if (anime.mode === 'range') {
-        return dateStr >= anime.startDate && dateStr <= anime.endDate;
+        if (dateStr >= anime.startDate && dateStr <= anime.endDate) {
+          result.push(anime);
+        }
       }
-      return false;
-    });
+    }
+    return result;
   }
-  
+
   function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    var year = date.getFullYear();
+    var month = String(date.getMonth() + 1).padStart(2, '0');
+    var day = String(date.getDate()).padStart(2, '0');
     return year + '-' + month + '-' + day;
   }
-  
-  function setupEventListeners() {
-    document.getElementById('prev-month').addEventListener('click', function() {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      }
-      generateCalendar();
-    });
-    
-    document.getElementById('next-month').addEventListener('click', function() {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      generateCalendar();
-    });
-    
-    document.getElementById('weekly-mode-btn').addEventListener('click', function() {
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    } else if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    }
+    renderCalendar();
+    renderCurrentMonth();
+  }
+
+  function switchMode(mode) {
+    if (mode === 'weekly') {
       document.getElementById('weekly-form').style.display = 'block';
       document.getElementById('range-form').style.display = 'none';
-      this.style.backgroundColor = '#4CAF50';
-      this.style.color = 'white';
+      document.getElementById('weekly-mode-btn').style.backgroundColor = '#4CAF50';
+      document.getElementById('weekly-mode-btn').style.color = 'white';
       document.getElementById('range-mode-btn').style.backgroundColor = '#f0f0f0';
       document.getElementById('range-mode-btn').style.color = '#333';
-    });
-    
-    document.getElementById('range-mode-btn').addEventListener('click', function() {
+    } else {
       document.getElementById('weekly-form').style.display = 'none';
       document.getElementById('range-form').style.display = 'block';
-      this.style.backgroundColor = '#4CAF50';
-      this.style.color = 'white';
+      document.getElementById('range-mode-btn').style.backgroundColor = '#4CAF50';
+      document.getElementById('range-mode-btn').style.color = 'white';
       document.getElementById('weekly-mode-btn').style.backgroundColor = '#f0f0f0';
       document.getElementById('weekly-mode-btn').style.color = '#333';
-    });
-    
-    document.getElementById('add-weekly-btn').addEventListener('click', function() {
-      const title = document.getElementById('weekly-title').value;
-      const type = document.getElementById('weekly-type').value;
-      const day = document.getElementById('weekly-day').value;
-      const time = document.getElementById('weekly-time').value;
-      
-      if (!title || !type || !day || !time) {
-        alert('请填写完整信息');
-        return;
-      }
-      
-      const anime = {
-        id: Date.now().toString(),
-        mode: 'weekly',
-        title: title,
-        type: type,
-        dayOfWeek: parseInt(day),
-        time: time,
-        startDate: document.getElementById('weekly-start').value || null,
-        endDate: document.getElementById('weekly-end').value || null
-      };
-      
-      animeList.push(anime);
-      localStorage.setItem('animeList', JSON.stringify(animeList));
-      generateCalendar();
-      
-      document.getElementById('weekly-title').value = '';
-      document.getElementById('weekly-type').value = '';
-      document.getElementById('weekly-day').value = '';
-      document.getElementById('weekly-time').value = '';
-      document.getElementById('weekly-start').value = '';
-      document.getElementById('weekly-end').value = '';
-    });
-    
-    document.getElementById('add-range-btn').addEventListener('click', function() {
-      const title = document.getElementById('range-title').value;
-      const type = document.getElementById('range-type').value;
-      const startDate = document.getElementById('range-start').value;
-      const endDate = document.getElementById('range-end').value;
-      const time = document.getElementById('range-time').value;
-      
-      if (!title || !type || !startDate || !endDate || !time) {
-        alert('请填写完整信息');
-        return;
-      }
-      
-      const anime = {
-        id: Date.now().toString(),
-        mode: 'range',
-        title: title,
-        type: type,
-        startDate: startDate,
-        endDate: endDate,
-        time: time
-      };
-      
-      animeList.push(anime);
-      localStorage.setItem('animeList', JSON.stringify(animeList));
-      generateCalendar();
-      
-      document.getElementById('range-title').value = '';
-      document.getElementById('range-type').value = '';
-      document.getElementById('range-start').value = '';
-      document.getElementById('range-end').value = '';
-      document.getElementById('range-time').value = '';
-    });
+    }
   }
-  
-  window.showAnimeDetail = function(id) {
-    const anime = animeList.find(a => a.id === id);
+
+  function addWeeklyAnime() {
+    var title = document.getElementById('weekly-title').value;
+    var type = document.getElementById('weekly-type').value;
+    var day = document.getElementById('weekly-day').value;
+    var time = document.getElementById('weekly-time').value;
+    var startDate = document.getElementById('weekly-start').value;
+    var endDate = document.getElementById('weekly-end').value;
+
+    if (!title || !type || !day || !time) {
+      alert('请填写完整信息');
+      return;
+    }
+
+    var anime = {
+      id: Date.now().toString(),
+      mode: 'weekly',
+      title: title,
+      type: type,
+      dayOfWeek: parseInt(day),
+      time: time,
+      startDate: startDate || null,
+      endDate: endDate || null
+    };
+
+    animeList.push(anime);
+    localStorage.setItem('animeList', JSON.stringify(animeList));
+    renderCalendar();
+
+    document.getElementById('weekly-title').value = '';
+    document.getElementById('weekly-type').value = '';
+    document.getElementById('weekly-day').value = '';
+    document.getElementById('weekly-time').value = '';
+    document.getElementById('weekly-start').value = '';
+    document.getElementById('weekly-end').value = '';
+  }
+
+  function addRangeAnime() {
+    var title = document.getElementById('range-title').value;
+    var type = document.getElementById('range-type').value;
+    var startDate = document.getElementById('range-start').value;
+    var endDate = document.getElementById('range-end').value;
+    var time = document.getElementById('range-time').value;
+
+    if (!title || !type || !startDate || !endDate || !time) {
+      alert('请填写完整信息');
+      return;
+    }
+
+    var anime = {
+      id: Date.now().toString(),
+      mode: 'range',
+      title: title,
+      type: type,
+      startDate: startDate,
+      endDate: endDate,
+      time: time
+    };
+
+    animeList.push(anime);
+    localStorage.setItem('animeList', JSON.stringify(animeList));
+    renderCalendar();
+
+    document.getElementById('range-title').value = '';
+    document.getElementById('range-type').value = '';
+    document.getElementById('range-start').value = '';
+    document.getElementById('range-end').value = '';
+    document.getElementById('range-time').value = '';
+  }
+
+  function showAnimeDetail(id) {
+    var anime = null;
+    for (var i = 0; i < animeList.length; i++) {
+      if (animeList[i].id === id) {
+        anime = animeList[i];
+        break;
+      }
+    }
     if (!anime) return;
-    
-    const typeNames = { japanese: '日剧/动漫', korean: '韩剧', chinese: '国产剧' };
-    let message = '剧集：' + anime.title + '\n';
+
+    var typeNames = { japanese: '日剧/动漫', korean: '韩剧', chinese: '国产剧' };
+    var message = '剧集：' + anime.title + '\n';
     message += '类型：' + typeNames[anime.type] + '\n';
     message += '时间：' + anime.time + '\n';
-    
+
     if (anime.mode === 'weekly') {
-      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
       message += '每周：' + weekdays[anime.dayOfWeek] + '\n';
       if (anime.startDate) message += '开始：' + anime.startDate + '\n';
       if (anime.endDate) message += '结束：' + anime.endDate + '\n';
     } else {
       message += '日期范围：' + anime.startDate + ' 至 ' + anime.endDate + '\n';
     }
-    
     alert(message);
-  };
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
   }
-})();
+
+  window.onload = initCalendar;
 </script>
