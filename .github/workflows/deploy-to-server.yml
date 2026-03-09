@@ -52,6 +52,16 @@ jobs:
         name: site-static
 
     - name: Deploy to server via SSH
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_PORT || '22' }}
+        source: "site-static.zip"
+        target: "/tmp/blog-deploy/"
+
+    - name: Extract and deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER_HOST }}
@@ -62,13 +72,12 @@ jobs:
           # 创建临时目录
           mkdir -p /tmp/blog-deploy
           
-          # 上传并解压文件
+          # 解压文件
           cd /tmp/blog-deploy
-          unzip -o /home/runner/work/ChiakyaKratos/ChiakyaKratos/site-static.zip
+          unzip -o site-static.zip
           
           # 复制到网站目录（根据你的宝塔配置修改路径）
-          # 请将 /www/wwwroot/your-domain.com 替换为你的宝塔网站根目录
-          cp -r /tmp/blog-deploy/public/* /www/wwwroot/Chiakya.cc/
+          cp -r public/* /www/wwwroot/Chiakya.cc/
           
           # 设置正确的权限
           chmod -R 755 /www/wwwroot/Chiakya.cc/
