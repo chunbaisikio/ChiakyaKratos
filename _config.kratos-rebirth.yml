@@ -12,8 +12,8 @@ image:
   favicon: "/assets/favicon.png" # 站点图标
   #avatar: "/assets/logo.webp" # 个人信息挂件上的头像
   banner:
-    light: "https://dev.krt.moe/demo-assets/banner.webp"
-    dark: "https://dev.krt.moe/demo-assets/banner_dark.webp"
+    light: "source/assets/Lolita.png"
+    dark: "source/assets/Lolita.png"
   background:
     # light: "https://dev.krt.moe/demo-assets/bg.webp"
     light: "source/assets/Joan.png"
