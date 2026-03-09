@@ -1,0 +1,79 @@
+name: Build and Deploy to Server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Node.js env
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+        run_install: false
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install Hexo environment
+      run: pnpm install
+
+    - name: Hexo build site
+      run: npx hexo generate --force
+
+    - name: Create deployment archive
+      run: zip -r site-static.zip public
+
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: site-static
+        path: site-static.zip
+        retention-days: 7
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: site-static
+
+    - name: Deploy to server via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_PORT || '22' }}
+        script: |
+          # 创建临时目录
+          mkdir -p /tmp/blog-deploy
+          
+          # 上传并解压文件
+          cd /tmp/blog-deploy
+          unzip -o /home/runner/work/ChiakyaKratos/ChiakyaKratos/site-static.zip
+          
+          # 复制到网站目录（根据你的宝塔配置修改路径）
+          # 请将 /www/wwwroot/your-domain.com 替换为你的宝塔网站根目录
+          cp -r /tmp/blog-deploy/public/* /www/wwwroot/your-domain.com/
+          
+          # 设置正确的权限
+          chmod -R 755 /www/wwwroot/your-domain.com/
+          
+          # 清理临时文件
+          rm -rf /tmp/blog-deploy
+          
+          echo "Deployment completed successfully!"
