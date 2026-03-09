@@ -31,6 +31,9 @@ nav:
     - label: 档案馆
       icon: file
       url: /archives/
+    - label: 追番日历
+      icon: calendar
+      url: /anime-calendar/
     - label: 链接
       icon: link
       submenu:
