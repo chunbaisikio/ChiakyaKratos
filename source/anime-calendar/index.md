@@ -42,46 +42,66 @@ layout: page
     </div>
     
     <div id="weekly-form">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
-        <input type="text" id="weekly-title" placeholder="剧集名称" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <select id="weekly-type" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <option value="">选择类型</option>
-          <option value="japanese">日剧/动漫</option>
-          <option value="korean">韩剧</option>
-          <option value="chinese">国产剧</option>
-        </select>
-        <select id="weekly-day" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <option value="">选择星期</option>
-          <option value="1">周一</option>
-          <option value="2">周二</option>
-          <option value="3">周三</option>
-          <option value="4">周四</option>
-          <option value="5">周五</option>
-          <option value="6">周六</option>
-          <option value="0">周日</option>
-        </select>
-        <input type="time" id="weekly-time" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="date" id="weekly-start" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="date" id="weekly-end" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <button id="add-weekly-btn" style="padding: 8px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">添加</button>
-      </div>
+      <table style="width: 100%; margin-bottom: 15px;">
+        <tr>
+          <td style="padding: 5px;"><input type="text" id="weekly-title" placeholder="剧集名称" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+          <td style="padding: 5px;">
+            <select id="weekly-type" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              <option value="">选择类型</option>
+              <option value="japanese">日剧/动漫</option>
+              <option value="korean">韩剧</option>
+              <option value="chinese">国产剧</option>
+            </select>
+          </td>
+          <td style="padding: 5px;">
+            <select id="weekly-day" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              <option value="">选择星期</option>
+              <option value="1">周一</option>
+              <option value="2">周二</option>
+              <option value="3">周三</option>
+              <option value="4">周四</option>
+              <option value="5">周五</option>
+              <option value="6">周六</option>
+              <option value="0">周日</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 5px;"><input type="time" id="weekly-time" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+          <td style="padding: 5px;"><input type="date" id="weekly-start" placeholder="开始日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+          <td style="padding: 5px;"><input type="date" id="weekly-end" placeholder="结束日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+        </tr>
+        <tr>
+          <td colspan="3" style="padding: 5px; text-align: center;">
+            <button id="add-weekly-btn" style="padding: 10px 30px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">添加剧集</button>
+          </td>
+        </tr>
+      </table>
       <p style="font-size: 12px; color: #666; margin-top: 10px;">提示：开始和结束日期可选，不填则永久显示</p>
     </div>
     
     <div id="range-form" style="display: none;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
-        <input type="text" id="range-title" placeholder="剧集名称" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <select id="range-type" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <option value="">选择类型</option>
-          <option value="japanese">日剧/动漫</option>
-          <option value="korean">韩剧</option>
-          <option value="chinese">国产剧</option>
-        </select>
-        <input type="date" id="range-start" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="date" id="range-end" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="time" id="range-time" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-        <button id="add-range-btn" style="padding: 8px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">添加</button>
-      </div>
+      <table style="width: 100%; margin-bottom: 15px;">
+        <tr>
+          <td style="padding: 5px;"><input type="text" id="range-title" placeholder="剧集名称" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+          <td style="padding: 5px;">
+            <select id="range-type" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              <option value="">选择类型</option>
+              <option value="japanese">日剧/动漫</option>
+              <option value="korean">韩剧</option>
+              <option value="chinese">国产剧</option>
+            </select>
+          </td>
+          <td style="padding: 5px;"><input type="time" id="range-time" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+        </tr>
+        <tr>
+          <td style="padding: 5px;"><input type="date" id="range-start" placeholder="开始日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+          <td style="padding: 5px;"><input type="date" id="range-end" placeholder="结束日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+          <td style="padding: 5px; text-align: center;">
+            <button id="add-range-btn" style="padding: 10px 30px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">添加剧集</button>
+          </td>
+        </tr>
+      </table>
       <p style="font-size: 12px; color: #666; margin-top: 10px;">提示：将在指定日期范围内每天显示</p>
     </div>
   </div>
