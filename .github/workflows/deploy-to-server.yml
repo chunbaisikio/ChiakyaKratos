@@ -79,8 +79,9 @@ jobs:
           # 复制到网站目录（根据你的宝塔配置修改路径）
           cp -r public/* /www/wwwroot/Chiakya.cc/
           
-          # 设置正确的权限
-          chmod -R 755 /www/wwwroot/Chiakya.cc/
+          # 设置正确的权限（排除 .user.ini 文件）
+          find /www/wwwroot/Chiakya.cc/ -type f -not -name ".user.ini" -exec chmod 644 {} \;
+          find /www/wwwroot/Chiakya.cc/ -type d -exec chmod 755 {} \;
           
           # 清理临时文件
           rm -rf /tmp/blog-deploy
