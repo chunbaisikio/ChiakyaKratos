@@ -68,10 +68,10 @@ jobs:
           
           # 复制到网站目录（根据你的宝塔配置修改路径）
           # 请将 /www/wwwroot/your-domain.com 替换为你的宝塔网站根目录
-          cp -r /tmp/blog-deploy/public/* /www/wwwroot/your-domain.com/
+          cp -r /tmp/blog-deploy/public/* /www/wwwroot/Chiakya.cc/
           
           # 设置正确的权限
-          chmod -R 755 /www/wwwroot/your-domain.com/
+          chmod -R 755 /www/wwwroot/Chiakya.cc/
           
           # 清理临时文件
           rm -rf /tmp/blog-deploy
