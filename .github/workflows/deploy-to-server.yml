@@ -29,6 +29,12 @@ jobs:
 
     - name: Hexo build site
       run: npx hexo generate --force
+    
+    - name: Verify build output
+      run: |
+        ls -l public/index.html
+        wc -c public/index.html
+        head -n 5 public/index.html
 
     - name: Create deployment archive
       run: zip -r site-static.zip public
@@ -75,6 +81,10 @@ jobs:
           # 解压文件
           cd /tmp/blog-deploy
           unzip -o site-static.zip
+          
+          # 解压后校验首页
+          ls -l /tmp/blog-deploy/public/index.html || true
+          wc -c /tmp/blog-deploy/public/index.html || true
           
           # 复制到网站目录（根据你的宝塔配置修改路径）
           cp -a public/. /www/wwwroot/Chiakya.cc/
