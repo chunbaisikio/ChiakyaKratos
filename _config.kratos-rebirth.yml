@@ -17,10 +17,10 @@ image:
     # dark: "https://dev.krt.moe/demo-assets/banner_dark.webp"
     dark: "/assets/Lolita.webp"
   background:
-    # light: "https://dev.krt.moe/demo-assets/bg.webp"
-    light: "/assets/Joan.webp"
-    # dark: "https://dev.krt.moe/demo-assets/bg_dark.webp"
-    dark: "/assets/Lolita.webp"
+    light: "https://dev.krt.moe/demo-assets/bg.webp"
+    # light: "/assets/Joan.webp"
+    dark: "https://dev.krt.moe/demo-assets/bg_dark.webp"
+    # dark: "/assets/Lolita.webp"
 
 # 顶部导航栏配置
 nav:
