@@ -15,11 +15,6 @@ layout: page
     cursor: pointer;
   }
 
-  #anime-calendar-app .weekday-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-  }
 </style>
 
 <div id="anime-calendar-app">
@@ -52,77 +47,8 @@ layout: page
   </div>
   
   <div style="margin-top: 30px; padding: 20px; background-color: #f5f5f5; border-radius: 8px;">
-    <h3>添加新剧集</h3>
-    
-    <div style="margin-bottom: 15px;">
-      <button id="weekly-mode-btn" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">每周固定时间</button>
-      <button id="range-mode-btn" style="padding: 10px 20px; background-color: #f0f0f0; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">持续时间段</button>
-    </div>
-    
-    <div id="weekly-form">
-      <table style="width: 100%; margin-bottom: 15px;">
-        <tr>
-          <td style="padding: 5px;"><input type="text" id="weekly-title" placeholder="剧集名称" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
-          <td style="padding: 5px;">
-            <select id="weekly-type" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-              <option value="">选择类型</option>
-              <option value="japanese">日剧/动漫</option>
-              <option value="korean">韩剧</option>
-              <option value="chinese">国产剧</option>
-            </select>
-          </td>
-          <td style="padding: 5px;">
-            <div class="weekday-options">
-              <label><input type="checkbox" class="weekly-day" value="1"> 周一</label>
-              <label><input type="checkbox" class="weekly-day" value="2"> 周二</label>
-              <label><input type="checkbox" class="weekly-day" value="3"> 周三</label>
-              <label><input type="checkbox" class="weekly-day" value="4"> 周四</label>
-              <label><input type="checkbox" class="weekly-day" value="5"> 周五</label>
-              <label><input type="checkbox" class="weekly-day" value="6"> 周六</label>
-              <label><input type="checkbox" class="weekly-day" value="0"> 周日</label>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 5px;"><input type="date" id="weekly-start" placeholder="开始日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
-          <td style="padding: 5px;">
-            <input type="number" id="weekly-weeks" min="1" placeholder="持续几周" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          </td>
-          <td style="padding: 5px;"></td>
-        </tr>
-        <tr>
-          <td colspan="3" style="padding: 5px; text-align: center;">
-            <button id="add-weekly-btn" style="padding: 10px 30px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">添加剧集</button>
-          </td>
-        </tr>
-      </table>
-      <p style="font-size: 12px; color: #666; margin-top: 10px;">提示：开始和结束日期可选，不填则永久显示；填写“持续几周”时需要填写开始日期</p>
-    </div>
-    
-    <div id="range-form" style="display: none;">
-      <table style="width: 100%; margin-bottom: 15px;">
-        <tr>
-          <td style="padding: 5px;"><input type="text" id="range-title" placeholder="剧集名称" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
-          <td style="padding: 5px;">
-            <select id="range-type" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-              <option value="">选择类型</option>
-              <option value="japanese">日剧/动漫</option>
-              <option value="korean">韩剧</option>
-              <option value="chinese">国产剧</option>
-            </select>
-          </td>
-          <td style="padding: 5px;"></td>
-        </tr>
-        <tr>
-          <td style="padding: 5px;"><input type="date" id="range-start" placeholder="开始日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
-          <td style="padding: 5px;"><input type="date" id="range-end" placeholder="结束日期" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
-          <td style="padding: 5px; text-align: center;">
-            <button id="add-range-btn" style="padding: 10px 30px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">添加剧集</button>
-          </td>
-        </tr>
-      </table>
-      <p style="font-size: 12px; color: #666; margin-top: 10px;">提示：将在指定日期范围内每天显示</p>
-    </div>
+    <h3>剧集配置</h3>
+    <p>请在 <code>source/anime-calendar/data.json</code> 内编辑剧集配置，页面会自动读取并渲染。</p>
   </div>
 </div>
 
@@ -135,19 +61,7 @@ layout: page
     loadAnimeList();
     renderCalendar();
     renderCurrentMonth();
-    
-    document.getElementById('weekly-mode-btn').onclick = function() {
-      switchMode('weekly');
-    };
-    
-    document.getElementById('range-mode-btn').onclick = function() {
-      switchMode('range');
-    };
-    
-    document.getElementById('add-weekly-btn').onclick = addWeeklyAnime;
 
-    document.getElementById('add-range-btn').onclick = addRangeAnime;
-    
     document.getElementById('prev-month').onclick = function() {
       changeMonth(-1);
     };
@@ -159,10 +73,20 @@ layout: page
   }
 
   function loadAnimeList() {
-    var stored = localStorage.getItem('animeList');
-    if (stored) {
-      animeList = JSON.parse(stored);
-    }
+    fetch('data.json')
+      .then(function(response) {
+        if (!response.ok) throw new Error('加载失败');
+        return response.json();
+      })
+      .then(function(data) {
+        animeList = Array.isArray(data) ? data : [];
+        renderCalendar();
+      })
+      .catch(function(error) {
+        console.error(error);
+        animeList = [];
+        renderCalendar();
+      });
   }
 
   function renderCurrentMonth() {
@@ -273,123 +197,6 @@ layout: page
     }
     renderCalendar();
     renderCurrentMonth();
-  }
-
-  function switchMode(mode) {
-    if (mode === 'weekly') {
-      document.getElementById('weekly-form').style.display = 'block';
-      document.getElementById('range-form').style.display = 'none';
-      document.getElementById('weekly-mode-btn').style.backgroundColor = '#4CAF50';
-      document.getElementById('weekly-mode-btn').style.color = 'white';
-      document.getElementById('range-mode-btn').style.backgroundColor = '#f0f0f0';
-      document.getElementById('range-mode-btn').style.color = '#333';
-    } else {
-      document.getElementById('weekly-form').style.display = 'none';
-      document.getElementById('range-form').style.display = 'block';
-      document.getElementById('range-mode-btn').style.backgroundColor = '#4CAF50';
-      document.getElementById('range-mode-btn').style.color = 'white';
-      document.getElementById('weekly-mode-btn').style.backgroundColor = '#f0f0f0';
-      document.getElementById('weekly-mode-btn').style.color = '#333';
-    }
-  }
-
-  function addWeeklyAnime() {
-    var title = document.getElementById('weekly-title').value;
-    var type = document.getElementById('weekly-type').value;
-    var dayList = getSelectedWeeklyDays();
-    var startDate = document.getElementById('weekly-start').value;
-    var weeks = document.getElementById('weekly-weeks').value;
-
-    if (!title || !type || dayList.length === 0) {
-      alert('请填写完整信息');
-      return;
-    }
-    if (!weeks) {
-      alert('请填写持续周数');
-      return;
-    }
-    if (!startDate) {
-      alert('请填写开始日期');
-      return;
-    }
-    endDate = calculateEndDate(startDate, parseInt(weeks, 10));
-
-    var anime = {
-      id: Date.now().toString(),
-      mode: 'weekly',
-      title: title,
-      type: type,
-      dayOfWeek: dayList,
-      time: null,
-      startDate: startDate || null,
-      endDate: endDate || null
-    };
-
-    animeList.push(anime);
-    localStorage.setItem('animeList', JSON.stringify(animeList));
-    renderCalendar();
-
-    document.getElementById('weekly-title').value = '';
-    document.getElementById('weekly-type').value = '';
-    clearWeeklyDays();
-    document.getElementById('weekly-start').value = '';
-    document.getElementById('weekly-weeks').value = '';
-  }
-
-  function getSelectedWeeklyDays() {
-    var nodes = document.querySelectorAll('.weekly-day');
-    var days = [];
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].checked) {
-        days.push(parseInt(nodes[i].value, 10));
-      }
-    }
-    return days;
-  }
-
-  function clearWeeklyDays() {
-    var nodes = document.querySelectorAll('.weekly-day');
-    for (var i = 0; i < nodes.length; i++) {
-      nodes[i].checked = false;
-    }
-  }
-
-  function calculateEndDate(startDate, weeks) {
-    if (!weeks || isNaN(weeks)) return null;
-    var start = new Date(startDate + 'T00:00:00');
-    start.setDate(start.getDate() + weeks * 7 - 1);
-    return formatDate(start);
-  }
-
-
-  function addRangeAnime() {
-    var title = document.getElementById('range-title').value;
-    var type = document.getElementById('range-type').value;
-    var startDate = document.getElementById('range-start').value;
-    var endDate = document.getElementById('range-end').value;
-    if (!title || !type || !startDate || !endDate) {
-      alert('请填写完整信息');
-      return;
-    }
-
-    var anime = {
-      id: Date.now().toString(),
-      mode: 'range',
-      title: title,
-      type: type,
-      startDate: startDate,
-      endDate: endDate,
-      time: null
-    };
-
-    animeList.push(anime);
-    localStorage.setItem('animeList', JSON.stringify(animeList));
-    renderCalendar();
-
-    document.getElementById('range-title').value = '';
-    document.getElementById('range-type').value = '';
-    document.getElementById('range-start').value = '';
-    document.getElementById('range-end').value = '';
   }
 
   function showAnimeDetail(id) {
