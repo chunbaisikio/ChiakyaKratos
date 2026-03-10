@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <author>
+    <name>All contributors</name>
+  </author>
+  <generator uri="https://hexo.io/">Hexo</generator>
+  <id>https://krt.moe/</id>
+  <link href="https://krt.moe/" rel="alternate"/>
+  <link href="https://krt.moe/atom.xml" rel="self"/>
+  <rights>All rights reserved 2026, All contributors</rights>
+  <subtitle>一个独属于竹竹Chiakya的小窝</subtitle>
+  <title>Chiakya : Home</title>
+  <updated>2026-03-10T09:39:44.936Z</updated>
+  <entry>
+    <author>
+      <name>All contributors</name>
+    </author>
+    <category term="全新体验" scheme="https://krt.moe/categories/%E5%85%A8%E6%96%B0%E4%BD%93%E9%AA%8C/"/>
+    <category term="欢迎" scheme="https://krt.moe/tags/%E6%AC%A2%E8%BF%8E/"/>
+    <content>
+      <![CDATA[<p>欢迎使用 <code>Chiakya : Home</code> 这个我精心打造的 欢乐小窝！希望能在接下来的旅途中与您相伴，共同创造出更多难以忘怀的美好体验。</p>]]>
+    </content>
+    <id>https://krt.moe/posts/hello-world/</id>
+    <link href="https://krt.moe/posts/hello-world/"/>
+    <published>2026-03-01T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<p>欢迎使用 <code>Chiakya : Home</code> 这个我精心打造的 欢乐小窝！希望能在接下来的旅途中与您相伴，共同创造出更多难以忘怀的美好体验。</p>]]>
+    </summary>
+    <title>你好，世界！</title>
+    <updated>2026-03-10T09:39:44.936Z</updated>
+  </entry>
+</feed>
