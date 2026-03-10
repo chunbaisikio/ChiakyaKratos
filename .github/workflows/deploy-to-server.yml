@@ -77,11 +77,15 @@ jobs:
           unzip -o site-static.zip
           
           # 复制到网站目录（根据你的宝塔配置修改路径）
-          cp -r public/* /www/wwwroot/Chiakya.cc/
+          cp -a public/. /www/wwwroot/Chiakya.cc/
           
           # 设置正确的权限（排除 .user.ini 文件）
           find /www/wwwroot/Chiakya.cc/ -type f -not -name ".user.ini" -exec chmod 644 {} \;
           find /www/wwwroot/Chiakya.cc/ -type d -exec chmod 755 {} \;
+
+          # 校验首页是否写入
+          ls -l /www/wwwroot/Chiakya.cc/index.html || true
+          wc -c /www/wwwroot/Chiakya.cc/index.html || true
           
           # 清理临时文件
           rm -rf /tmp/blog-deploy
