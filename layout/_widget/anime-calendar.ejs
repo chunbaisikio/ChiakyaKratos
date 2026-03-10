@@ -1,0 +1,85 @@
+<aside class="widget widget-kratos-anime-calendar clearfix" style="border: 0; box-shadow: none;">
+  <h4 class="widget-title"><i class="fa fa-calendar"></i>追剧日历</h4>
+  <div data-anime-calendar-widget class="anime-calendar-widget">
+    <div style="padding: 6px 0; color: #888;">加载中...</div>
+  </div>
+  <div class="acw-overlay" data-acw-overlay>
+    <div class="acw-overlay-card" data-acw-overlay-card></div>
+  </div>
+</aside>
+
+<style>
+  .anime-calendar-widget {
+    font-size: 12px;
+  }
+  .anime-calendar-widget .acw-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px 0 8px;
+    font-weight: 600;
+  }
+  .anime-calendar-widget table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .anime-calendar-widget th,
+  .anime-calendar-widget td {
+    width: 14.2857%;
+    height: 28px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #e6e6e6;
+    padding: 0;
+  }
+  .anime-calendar-widget .acw-today {
+    border: 2px solid #4CAF50;
+  }
+  .anime-calendar-widget .acw-weekend {
+    background-color: #eeeeee;
+  }
+  .anime-calendar-widget .acw-day {
+    display: block;
+    font-size: 11px;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .anime-calendar-widget .acw-dots {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .anime-calendar-widget .acw-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+  }
+  .acw-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+    padding: 16px;
+  }
+  .acw-overlay.is-open {
+    display: flex;
+  }
+  .acw-overlay-card {
+    background: #fff;
+    color: #333;
+    max-width: 420px;
+    width: 100%;
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+</style>
+
+<script src="/js/anime-calendar-widget.js" onload="window.AnimeCalendarWidgetInit && window.AnimeCalendarWidgetInit()"></script>

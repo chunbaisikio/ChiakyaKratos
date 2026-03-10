@@ -14,6 +14,31 @@ layout: page
   #anime-calendar-app .calendar-item {
     cursor: pointer;
   }
+  #anime-calendar-app .acw-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+    padding: 16px;
+  }
+  #anime-calendar-app .acw-overlay.is-open {
+    display: flex;
+  }
+  #anime-calendar-app .acw-overlay-card {
+    background: #fff;
+    color: #333;
+    max-width: 520px;
+    width: 100%;
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
 
 </style>
 
@@ -50,6 +75,10 @@ layout: page
     <h3>剧集配置</h3>
     <p>请在 <code>source/anime-calendar/data.json</code> 内编辑剧集配置，页面会自动读取并渲染。</p>
   </div>
+
+  <div class="acw-overlay" data-acw-overlay>
+    <div class="acw-overlay-card" data-acw-overlay-card></div>
+  </div>
 </div>
 
 <script>
@@ -69,7 +98,19 @@ layout: page
     document.getElementById('next-month').onclick = function() {
       changeMonth(1);
     };
+    bindOverlayClose();
 
+  }
+
+  function bindOverlayClose() {
+    var overlay = document.querySelector('[data-acw-overlay]');
+    var card = document.querySelector('[data-acw-overlay-card]');
+    if (!overlay || !card) return;
+    overlay.onclick = function(event) {
+      if (event.target === overlay) {
+        closeOverlay();
+      }
+    };
   }
 
   function loadAnimeList() {
@@ -212,6 +253,9 @@ layout: page
     var typeNames = { japanese: '日剧/动漫', korean: '韩剧', chinese: '国产剧' };
     var message = '剧集：' + anime.title + '\n';
     message += '类型：' + typeNames[anime.type] + '\n';
+    if (anime.description) {
+      message += '简介：' + anime.description + '\n';
+    }
     if (anime.mode === 'weekly') {
       var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
       var weeklyDays = Array.isArray(anime.dayOfWeek) ? anime.dayOfWeek : [anime.dayOfWeek];
@@ -222,7 +266,21 @@ layout: page
     } else {
       message += '日期范围：' + anime.startDate + ' 至 ' + anime.endDate + '\n';
     }
-    alert(message);
+    openOverlay(message);
+  }
+
+  function openOverlay(message) {
+    var overlay = document.querySelector('[data-acw-overlay]');
+    var card = document.querySelector('[data-acw-overlay-card]');
+    if (!overlay || !card) return;
+    card.textContent = message;
+    overlay.classList.add('is-open');
+  }
+
+  function closeOverlay() {
+    var overlay = document.querySelector('[data-acw-overlay]');
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
   }
 
   var calendarInitialized = false;
