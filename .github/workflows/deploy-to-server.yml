@@ -27,6 +27,9 @@ jobs:
     - name: Install Hexo environment
       run: pnpm install --frozen-lockfile
 
+    - name: Patch theme widget
+      run: ./scripts/patch-theme-widget.sh
+
     - name: Hexo build site
       run: pnpm exec hexo generate --force
     
