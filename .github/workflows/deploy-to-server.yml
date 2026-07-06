@@ -1,106 +1,133 @@
-name: Build and Deploy to Server
+name: Build, Publish, and Deploy
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: build-publish-deploy-main
+  cancel-in-progress: true
+
 jobs:
-  build:
+  build_publish_deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Setup Node.js env
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Setup Node.js env
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 10
-        run_install: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
 
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Install Hexo environment
-      run: pnpm install --frozen-lockfile
+      - name: Install Hexo environment
+        run: pnpm install --frozen-lockfile
 
-    - name: Patch theme widget
-      run: ./scripts/patch-theme-widget.sh
+      - name: Patch theme widget
+        run: ./scripts/patch-theme-widget.sh
 
-    - name: Hexo build site
-      run: pnpm exec hexo generate --force
-    
-    - name: Verify build output
-      run: |
-        ls -l public/index.html
-        wc -c public/index.html
-        head -n 5 public/index.html
+      - name: Hexo build site
+        run: pnpm exec hexo generate --force
 
-    - name: Create deployment archive
-      run: zip -r site-static.zip public
+      - name: Verify build output
+        run: |
+          test -f public/index.html
+          ls -l public/index.html
+          wc -c public/index.html
+          head -n 5 public/index.html
 
-    - name: Upload deployment artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: site-static
-        path: site-static.zip
-        retention-days: 7
+      - name: Publish static files to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./public
+          enable_jekyll: false
+          force_orphan: false
+          commit_message: "deploy: publish from ${{ github.sha }}"
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+      - name: Create deployment archive
+        run: tar -czf site-static.tar.gz -C public .
 
-    steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: site-static
+      - name: Upload archive to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GH_PAGES_SERVER_HOST }}
+          username: ${{ secrets.GH_PAGES_SERVER_USERNAME }}
+          password: ${{ secrets.GH_PAGES_SERVER_PASSWORD }}
+          port: ${{ secrets.GH_PAGES_SERVER_SSH_PORT || '22' }}
+          source: site-static.tar.gz
+          target: /tmp/chiakya-gh-pages-39015/
 
-    - name: Deploy to server via SSH
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        port: ${{ secrets.SERVER_PORT || '7777' }}
-        source: "site-static.zip"
-        target: "/tmp/blog-deploy/"
+      - name: Deploy archive and restart service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GH_PAGES_SERVER_HOST }}
+          username: ${{ secrets.GH_PAGES_SERVER_USERNAME }}
+          password: ${{ secrets.GH_PAGES_SERVER_PASSWORD }}
+          port: ${{ secrets.GH_PAGES_SERVER_SSH_PORT || '22' }}
+          script: |
+            set -eu
 
-    - name: Extract and deploy
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        port: ${{ secrets.SERVER_PORT || '7777' }}
-        script: |
-          # 创建临时目录
-          mkdir -p /tmp/blog-deploy
-          
-          # 解压文件
-          cd /tmp/blog-deploy
-          unzip -o site-static.zip
-          
-          # 解压后校验首页
-          ls -l /tmp/blog-deploy/public/index.html || true
-          wc -c /tmp/blog-deploy/public/index.html || true
-          
-          # 复制到网站目录（根据你的宝塔配置修改路径）
-          cp -a public/. /www/wwwroot/Chiakya.cc/
-          
-          # 设置正确的权限（排除 .user.ini 文件）
-          find /www/wwwroot/Chiakya.cc/ -type f -not -name ".user.ini" -exec chmod 644 {} \;
-          find /www/wwwroot/Chiakya.cc/ -type d -exec chmod 755 {} \;
+            app_root="/opt/chiakya-gh-pages-39015"
+            releases_dir="$app_root/releases"
+            current_link="$app_root/current"
+            service_name="chiakya-gh-pages-39015"
+            service_file="/etc/systemd/system/${service_name}.service"
+            archive_path="/tmp/chiakya-gh-pages-39015/site-static.tar.gz"
+            release_id="$(date +%Y%m%d%H%M%S)"
+            release_dir="$releases_dir/$release_id"
 
-          # 校验首页是否写入
-          ls -l /www/wwwroot/Chiakya.cc/index.html || true
-          wc -c /www/wwwroot/Chiakya.cc/index.html || true
-          
-          # 清理临时文件
-          rm -rf /tmp/blog-deploy
-          
-          echo "Deployment completed successfully!"
+            mkdir -p "$release_dir"
+            tar -xzf "$archive_path" -C "$release_dir"
+            ln -sfn "$release_dir" "$current_link"
+
+            if command -v systemctl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+              printf '%s\n' \
+                '[Unit]' \
+                'Description=Chiakya gh-pages static site on port 39015' \
+                'After=network.target' \
+                '' \
+                '[Service]' \
+                'Type=simple' \
+                "WorkingDirectory=$current_link" \
+                "ExecStart=/usr/bin/python3 -m http.server 39015 --bind 0.0.0.0 --directory $current_link" \
+                'Restart=always' \
+                'RestartSec=3' \
+                'User=root' \
+                '' \
+                '[Install]' \
+                'WantedBy=multi-user.target' \
+                > "$service_file"
+
+              systemctl daemon-reload
+              systemctl enable "$service_name"
+              systemctl restart "$service_name"
+              systemctl --no-pager --full status "$service_name" | head -n 20 || true
+            elif command -v python3 >/dev/null 2>&1; then
+              pkill -f "python3 -m http.server 39015" || true
+              nohup python3 -m http.server 39015 --bind 0.0.0.0 --directory "$current_link" \
+                >/var/log/${service_name}.log 2>&1 &
+              sleep 2
+              ps -ef | grep "[p]ython3 -m http.server 39015" || true
+            else
+              echo "python3 is required on the remote server" >&2
+              exit 1
+            fi
+
+            find "$release_dir" -type f -exec chmod 644 {} \;
+            find "$release_dir" -type d -exec chmod 755 {} \;
+            rm -rf /tmp/chiakya-gh-pages-39015
+
+            curl -I --max-time 10 http://127.0.0.1:39015/ || true
