@@ -35,7 +35,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Patch theme widget
-        run: ./scripts/patch-theme-widget.sh
+        run: ./tools/patch-theme-widget.sh
 
       - name: Hexo build site
         run: pnpm exec hexo generate --force
@@ -68,7 +68,7 @@ jobs:
           password: ${{ secrets.GH_PAGES_SERVER_PASSWORD }}
           port: ${{ secrets.GH_PAGES_SERVER_SSH_PORT || '22' }}
           source: site-static.tar.gz
-          target: /tmp/chiakya-gh-pages-39015/
+          target: /tmp/chiakya-gh-pages-39016/
 
       - name: Deploy archive and restart service
         uses: appleboy/ssh-action@v1.0.3
@@ -80,12 +80,12 @@ jobs:
           script: |
             set -eu
 
-            app_root="/opt/chiakya-gh-pages-39015"
+            app_root="/opt/chiakya-gh-pages-39016"
             releases_dir="$app_root/releases"
             current_link="$app_root/current"
-            service_name="chiakya-gh-pages-39015"
+            service_name="chiakya-gh-pages-39016"
             service_file="/etc/systemd/system/${service_name}.service"
-            archive_path="/tmp/chiakya-gh-pages-39015/site-static.tar.gz"
+            archive_path="/tmp/chiakya-gh-pages-39016/site-static.tar.gz"
             release_id="$(date +%Y%m%d%H%M%S)"
             release_dir="$releases_dir/$release_id"
 
@@ -96,13 +96,13 @@ jobs:
             if command -v systemctl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
               printf '%s\n' \
                 '[Unit]' \
-                'Description=Chiakya gh-pages static site on port 39015' \
+                'Description=Chiakya gh-pages static site on port 39016' \
                 'After=network.target' \
                 '' \
                 '[Service]' \
                 'Type=simple' \
                 "WorkingDirectory=$current_link" \
-                "ExecStart=/usr/bin/python3 -m http.server 39015 --bind 0.0.0.0 --directory $current_link" \
+                "ExecStart=/usr/bin/python3 -m http.server 39016 --bind 0.0.0.0 --directory $current_link" \
                 'Restart=always' \
                 'RestartSec=3' \
                 'User=root' \
@@ -116,11 +116,11 @@ jobs:
               systemctl restart "$service_name"
               systemctl --no-pager --full status "$service_name" | head -n 20 || true
             elif command -v python3 >/dev/null 2>&1; then
-              pkill -f "python3 -m http.server 39015" || true
-              nohup python3 -m http.server 39015 --bind 0.0.0.0 --directory "$current_link" \
+              pkill -f "python3 -m http.server 39016" || true
+              nohup python3 -m http.server 39016 --bind 0.0.0.0 --directory "$current_link" \
                 >/var/log/${service_name}.log 2>&1 &
               sleep 2
-              ps -ef | grep "[p]ython3 -m http.server 39015" || true
+              ps -ef | grep "[p]ython3 -m http.server 39016" || true
             else
               echo "python3 is required on the remote server" >&2
               exit 1
@@ -128,6 +128,6 @@ jobs:
 
             find "$release_dir" -type f -exec chmod 644 {} \;
             find "$release_dir" -type d -exec chmod 755 {} \;
-            rm -rf /tmp/chiakya-gh-pages-39015
+            rm -rf /tmp/chiakya-gh-pages-39016
 
-            curl -I --max-time 10 http://127.0.0.1:39015/ || true
+            curl -I --max-time 10 http://127.0.0.1:39016/ || true

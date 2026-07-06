@@ -12,4 +12,3 @@ fi
 
 mkdir -p "$theme_dir/layout/_widget"
 cp "$source_file" "$theme_dir/layout/_widget/anime-calendar.ejs"
-
