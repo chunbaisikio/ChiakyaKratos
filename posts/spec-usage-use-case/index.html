@@ -7,8 +7,8 @@
     <link rel="icon" href="/assets/favicon.png">
   
   
-  <title>链接列表（样例） | Chiakya : Home</title>
-  <link rel="canonical" href="https://krt.moe/linklist-example/index.html">
+  <title>Spec 使用用例：把模糊需求变成可执行交付 | Chiakya : Home</title>
+  <link rel="canonical" href="https://krt.moe/posts/spec-usage-use-case/">
   <meta name="author" content="All contributors" />
   <meta http-equiv="Cache-Control" content="no-transform" />
   <meta http-equiv="Cache-Control" content="no-siteapp" />
@@ -17,22 +17,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="format-detection" content="telphone=no, email=no" />
   
-    <meta name="keywords" content="hexo,theme,chiakya-home" />
+    <meta name="keywords" content="Spec, 工作流, 需求分析, 项目管理" />
   
-  <meta name="description" content="(() &#x3D;&gt; {               const flist &#x3D; [{&quot;title&quot;:&quot;Hexo&quot;,&quot;description&quot;:&quot;快速、简洁且高效的博客框架&quot;,&quot;image&quot;:&quot;https:&#x2F;&#x2F;hexo.io&#x2F;logo.svg&quot;,&quot;link&quot;:&quot;https:&#x2F;&#x2F;hexo.io&#x2F;zh-cn&#x2F;&quot;},{&quot;title&quot;:&quot;Chiakya : Home&quot;,&quot;">
-<meta property="og:type" content="website">
-<meta property="og:title" content="链接列表（样例）">
-<meta property="og:url" content="https://krt.moe/linklist-example/index.html">
+  <meta name="description" content="很多项目推进不顺，不是因为大家不努力，而是因为一开始说的“要做什么”并没有被真正讲清楚。 一句“做一个新功能”、一句“把体验优化一下”，在不同角色眼里往往是完全不同的事情。产品理解的是业务目标，设计理解的是页面体验，开发理解的是实现范围，测试理解的是验收口径。只要这些理解没有被对齐，项目推进得越快，后面返工的成本往往越高。 这时候，spec 的价值就出来了。 spec 不是为了把文档写得很重，而是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spec 使用用例：把模糊需求变成可执行交付">
+<meta property="og:url" content="https://krt.moe/posts/spec-usage-use-case/index.html">
 <meta property="og:site_name" content="Chiakya : Home">
-<meta property="og:description" content="(() &#x3D;&gt; {               const flist &#x3D; [{&quot;title&quot;:&quot;Hexo&quot;,&quot;description&quot;:&quot;快速、简洁且高效的博客框架&quot;,&quot;image&quot;:&quot;https:&#x2F;&#x2F;hexo.io&#x2F;logo.svg&quot;,&quot;link&quot;:&quot;https:&#x2F;&#x2F;hexo.io&#x2F;zh-cn&#x2F;&quot;},{&quot;title&quot;:&quot;Chiakya : Home&quot;,&quot;">
+<meta property="og:description" content="很多项目推进不顺，不是因为大家不努力，而是因为一开始说的“要做什么”并没有被真正讲清楚。 一句“做一个新功能”、一句“把体验优化一下”，在不同角色眼里往往是完全不同的事情。产品理解的是业务目标，设计理解的是页面体验，开发理解的是实现范围，测试理解的是验收口径。只要这些理解没有被对齐，项目推进得越快，后面返工的成本往往越高。 这时候，spec 的价值就出来了。 spec 不是为了把文档写得很重，而是">
 <meta property="og:locale">
 <meta property="og:image" content="https://krt.moe/assets/favicon.png">
-<meta property="article:published_time" content="2025-09-30T22:43:02.000Z">
-<meta property="article:modified_time" content="2026-07-06T14:31:17.889Z">
+<meta property="article:published_time" content="2026-03-30T11:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-06T14:31:17.882Z">
 <meta property="article:author" content="All contributors">
-<meta property="article:tag" content="chiakya-home">
-<meta property="article:tag" content="hexo">
-<meta property="article:tag" content="theme">
+<meta property="article:tag" content="Spec">
+<meta property="article:tag" content="工作流">
+<meta property="article:tag" content="需求分析">
+<meta property="article:tag" content="项目管理">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://krt.moe/assets/favicon.png">
   
@@ -40,6 +41,10 @@
   
   <!-- JSON-LD 结构化数据 -->
   
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Spec 使用用例：把模糊需求变成可执行交付","description":"很多项目推进不顺，不是因为大家不努力，而是因为一开始说的“要做什么”并没有被真正讲清楚。\n一句“做一个新功能”、一句“把体验优化一下”，在不同角色眼里往往是完全不同的事情。产品理解的是业务目标，设计理解的是页面体验，开发理解的是实现范围，测试理解的是验收口径。只要这些理解没...","image":"https://krt.moe/images/user.svg","author":{"@type":"Person","name":"All contributors"},"publisher":{"@type":"Organization","name":"Chiakya : Home","logo":{"@type":"ImageObject","url":"https://krt.moe/images/user.svg"}},"datePublished":"2026-03-30T11:30:00.000Z","dateModified":"2026-07-06T14:31:17.882Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://krt.moe/posts/spec-usage-use-case/"}}
+    </script>
   
   <!-- 关键 CSS 预加载 -->
   <link rel="preload" href="/css/kr-core.min.css" as="style" crossorigin>
@@ -232,47 +237,150 @@
         
 
             <article itemscope itemtype="https://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://krt.moe/linklist-example/index.html">
+    <link itemprop="mainEntityOfPage" href="https://krt.moe/posts/spec-usage-use-case/">
     <div class="kratos-hentry kratos-page-inner clearfix">
         <header class="kratos-page-header">
             
-                <h1 class="kratos-page-title text-center" itemprop="name headline">链接列表（样例）</h1>
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Spec 使用用例：把模糊需求变成可执行交付</h1>
             
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-03-30T11:30:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-03-30</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">All contributors</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~2.54K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
         </header>
-        <div class="kratos-page-content kr-page">
-            <div itemprop="articleBody"><div class="kr-linklist">
-    <ul class="kr-linklist-container"></ul>
-    <script type="text/javascript">
-          (() => {
-              const flist = [{"title":"Hexo","description":"快速、简洁且高效的博客框架","image":"https://hexo.io/logo.svg","link":"https://hexo.io/zh-cn/"},{"title":"Chiakya : Home","description":"一个独属于竹竹Chiakya的小窝","image":"https://avatars.githubusercontent.com/u/170786100","link":"https://krt.moe/"},{"title":"本地图片","description":"可以使用本地资源作为链接的图片","image":"/images/user.svg","link":"/"},{"title":"新标签页","description":"所有链接会在新标签页中打开","image":"/images/user.svg","link":"/"}];
-              let friendNodes = '';
-              while (flist.length > 0) {
-                  const randID = Math.floor(Math.random()*flist.length);
-                  friendNodes += `<li>
-                    <a target="_blank" href="${flist[randID].link}">
-                      <img src="${flist[randID].image}" alt=${flist[randID].title} />
-                      <div>
-                        <span>${flist[randID].title}</span>
-                        <p>${flist[randID].description}</p>
-                      </div>
-                    </a>
-                  </li>`;
-                  flist.splice(randID, 1);
-              }
-      
-              document.currentScript.parentNode.querySelector(".kr-linklist-container").innerHTML = friendNodes;
-          })();
-          </script>
-  </div>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+                <div class="kratos-post-inner-toc toc-div-class" >
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%80%82%E5%90%88%E5%86%99%E6%88%90-spec-%E7%9A%84%E9%9C%80%E6%B1%82"><span class="toc-number">1.</span> <span class="toc-text">什么是适合写成 spec 的需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%A3%8E%E6%A0%BC%E7%9A%84%E4%BD%BF%E7%94%A8%E7%94%A8%E4%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">一个真实风格的使用用例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E7%AF%87-spec-%E5%8F%AF%E4%BB%A5%E6%80%8E%E4%B9%88%E5%86%99"><span class="toc-number">3.</span> <span class="toc-text">这篇 spec 可以怎么写</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%83%8C%E6%99%AF%E4%B8%8E%E7%9B%AE%E6%A0%87"><span class="toc-number">3.1.</span> <span class="toc-text">1. 背景与目标</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%8C%83%E5%9B%B4"><span class="toc-number">3.2.</span> <span class="toc-text">2. 范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%94%A8%E6%88%B7%E6%B5%81%E7%A8%8B"><span class="toc-number">3.3.</span> <span class="toc-text">3. 用户流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%A7%84%E5%88%99%E4%B8%8E%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B6"><span class="toc-number">3.4.</span> <span class="toc-text">4. 规则与边界条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E9%AA%8C%E6%94%B6%E6%A0%87%E5%87%86"><span class="toc-number">3.5.</span> <span class="toc-text">5. 验收标准</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#spec-%E5%9C%A8%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C%E9%87%8C%E7%9A%84%E5%AE%9E%E9%99%85%E4%BB%B7%E5%80%BC"><span class="toc-number">4.</span> <span class="toc-text">spec 在团队协作里的实际价值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%8D%E4%BD%8E%E6%B2%9F%E9%80%9A%E6%8D%9F%E8%80%97"><span class="toc-number">4.1.</span> <span class="toc-text">降低沟通损耗</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%8D%E4%BD%8E%E8%BF%94%E5%B7%A5%E6%A6%82%E7%8E%87"><span class="toc-number">4.2.</span> <span class="toc-text">降低返工概率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E9%AB%98%E5%8F%AF%E4%BA%A4%E6%8E%A5%E6%80%A7"><span class="toc-number">4.3.</span> <span class="toc-text">提高可交接性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A9%E9%AA%8C%E6%94%B6%E6%9B%B4%E5%AE%A2%E8%A7%82"><span class="toc-number">4.4.</span> <span class="toc-text">让验收更客观</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BB%BD%E8%BD%BB%E9%87%8F-spec-%E7%9A%84%E6%8E%A8%E8%8D%90%E7%BB%93%E6%9E%84"><span class="toc-number">5.</span> <span class="toc-text">一份轻量 spec 的推荐结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%B8%8D%E9%9C%80%E8%A6%81-spec"><span class="toc-number">6.</span> <span class="toc-text">什么时候不需要 spec</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-number">7.</span> <span class="toc-text">最后</span></a></li></ol>
+                </div>
+            
+            <hr />
+            <div itemprop="articleBody"><p>很多项目推进不顺，不是因为大家不努力，而是因为一开始说的“要做什么”并没有被真正讲清楚。</p>
+<p>一句“做一个新功能”、一句“把体验优化一下”，在不同角色眼里往往是完全不同的事情。产品理解的是业务目标，设计理解的是页面体验，开发理解的是实现范围，测试理解的是验收口径。只要这些理解没有被对齐，项目推进得越快，后面返工的成本往往越高。</p>
+<p>这时候，<code>spec</code> 的价值就出来了。</p>
+<p><code>spec</code> 不是为了把文档写得很重，而是为了在真正开工之前，把目标、范围、约束、流程和验收标准讲清楚。它更像一张共享地图，让参与者知道我们要去哪里、为什么去、走哪条路、怎样算到达。</p>
+<h2 id="什么是适合写成-spec-的需求"><a href="#什么是适合写成-spec-的需求" class="headerlink" title="什么是适合写成 spec 的需求"></a>什么是适合写成 spec 的需求</h2><p>并不是所有事情都值得单独写 spec，但下面这些场景非常适合：</p>
+<ul>
+<li>需求涉及多个角色协作，比如产品、设计、前端、后端、测试都要参与</li>
+<li>需求范围容易膨胀，今天是“小改动”，明天可能变成“大改版”</li>
+<li>需求上线后影响真实用户，返工成本高</li>
+<li>需求本身存在多个边界条件，不提前说明就很容易漏掉</li>
+<li>团队里有人是后来加入项目的，需要一份可以快速对齐上下文的材料</li>
+</ul>
+<p>如果一个需求满足上面两到三条，通常就值得先写 spec。</p>
+<h2 id="一个真实风格的使用用例"><a href="#一个真实风格的使用用例" class="headerlink" title="一个真实风格的使用用例"></a>一个真实风格的使用用例</h2><p>下面用一个很常见的场景来举例：</p>
+<blockquote>
+<p>我们准备给博客新增一个“文章订阅引导模块”，让第一次访问的用户能更容易订阅站点更新。</p>
+</blockquote>
+<p>如果这个需求不写 spec，团队里常见的理解会是这样的：</p>
+<ul>
+<li>产品会说，希望提升订阅转化率</li>
+<li>设计会理解成首页新增一个视觉卡片</li>
+<li>前端会理解成加一个组件</li>
+<li>后端会问，要不要记录点击数据</li>
+<li>测试会问，哪些页面显示，哪些页面不显示</li>
+</ul>
+<p>大家都没有错，但如果没有统一的 spec，最后很容易出现这些问题：</p>
+<ul>
+<li>首页做了，文章页没做</li>
+<li>桌面端好看，移动端挡住正文</li>
+<li>点击订阅后没有反馈，用户不知道自己是否成功</li>
+<li>已经订阅的用户还会重复看到引导</li>
+<li>上线后没人知道这次改动到底算不算达到目标</li>
+</ul>
+<h2 id="这篇-spec-可以怎么写"><a href="#这篇-spec-可以怎么写" class="headerlink" title="这篇 spec 可以怎么写"></a>这篇 spec 可以怎么写</h2><p>一个实用的 spec，不一定要很长，但最好回答下面几个问题。</p>
+<h3 id="1-背景与目标"><a href="#1-背景与目标" class="headerlink" title="1. 背景与目标"></a>1. 背景与目标</h3><p>先写清楚为什么要做，而不是一上来就写页面长什么样。</p>
+<p>示例：</p>
+<ul>
+<li>当前博客已有 RSS 与邮件订阅入口，但入口位置较深，普通访客不容易发现</li>
+<li>希望通过更直接的订阅引导，提升首次访问用户的订阅转化率</li>
+<li>本次改动的核心目标不是增加页面停留时长，而是提升订阅动作完成率</li>
+</ul>
+<p>这一步最重要的价值，是避免团队“做了很多事，但目标其实没对上”。</p>
+<h3 id="2-范围"><a href="#2-范围" class="headerlink" title="2. 范围"></a>2. 范围</h3><p>范围写清楚，后面就不容易失控。</p>
+<p>示例：</p>
+<p>本次包含：</p>
+<ul>
+<li>在首页和文章详情页展示订阅引导模块</li>
+<li>提供 RSS、邮件订阅两个入口</li>
+<li>记录模块曝光次数与点击次数</li>
+<li>在移动端适配显示样式</li>
+</ul>
+<p>本次不包含：</p>
+<ul>
+<li>订阅系统重构</li>
+<li>用户登录态打通</li>
+<li>个性化推荐订阅内容</li>
+<li>A&#x2F;B Test 平台接入</li>
+</ul>
+<p>很多返工，其实不是做错了，而是团队对“这次到底做到哪”没有提前约定。</p>
+<h3 id="3-用户流程"><a href="#3-用户流程" class="headerlink" title="3. 用户流程"></a>3. 用户流程</h3><p>一份好的 spec，最好能让别人不看代码也知道用户会经历什么。</p>
+<p>示例流程：</p>
+<ol>
+<li>用户首次进入首页</li>
+<li>页面在首屏下方展示订阅引导模块</li>
+<li>用户点击“通过 RSS 订阅”</li>
+<li>浏览器跳转到订阅地址</li>
+<li>系统记录一次点击事件</li>
+<li>如果用户关闭引导，则 7 天内不再展示</li>
+</ol>
+<p>有了流程，设计知道该做哪些状态，开发知道要处理哪些逻辑，测试也知道该怎么验收。</p>
+<h3 id="4-规则与边界条件"><a href="#4-规则与边界条件" class="headerlink" title="4. 规则与边界条件"></a>4. 规则与边界条件</h3><p>很多问题都不是出在主流程，而是边界条件没写。</p>
+<p>例如这个场景里，spec 至少应该写清楚：</p>
+<ul>
+<li>仅对未关闭过引导的用户展示</li>
+<li>本地关闭状态使用浏览器存储保存 7 天</li>
+<li>当页面宽度小于 768px 时，模块折叠为紧凑样式</li>
+<li>如果订阅链接加载失败，展示兜底文案与复制链接按钮</li>
+<li>同一页面一次访问仅记录一次曝光</li>
+</ul>
+<p>这部分写得越清楚，后面“这是不是 bug”这种反复拉扯就越少。</p>
+<h3 id="5-验收标准"><a href="#5-验收标准" class="headerlink" title="5. 验收标准"></a>5. 验收标准</h3><p>验收标准不是形式，它决定了项目什么时候算真的完成。</p>
+<p>示例：</p>
+<ul>
+<li>首页和文章页都能正常展示订阅引导模块</li>
+<li>桌面端与移动端布局无明显遮挡或溢出</li>
+<li>点击 RSS 或邮件订阅按钮都能跳转到正确地址</li>
+<li>用户关闭模块后，7 天内再次访问不再展示</li>
+<li>埋点可看到曝光与点击事件</li>
+</ul>
+<p>如果没有这部分，最后很容易出现“开发说做完了，测试说还不算完”的情况。</p>
+<h2 id="spec-在团队协作里的实际价值"><a href="#spec-在团队协作里的实际价值" class="headerlink" title="spec 在团队协作里的实际价值"></a>spec 在团队协作里的实际价值</h2><p>写 spec 最直接的好处，不是“文档更规范”，而是整个协作链路更顺。</p>
+<h3 id="降低沟通损耗"><a href="#降低沟通损耗" class="headerlink" title="降低沟通损耗"></a>降低沟通损耗</h3><p>大家不需要反复在聊天记录里翻“之前到底怎么说的”，因为关键决策都已经沉淀在同一份说明里。</p>
+<h3 id="降低返工概率"><a href="#降低返工概率" class="headerlink" title="降低返工概率"></a>降低返工概率</h3><p>很多返工都来自理解偏差。spec 本质上是在编码前暴露分歧，而不是在上线前才发现问题。</p>
+<h3 id="提高可交接性"><a href="#提高可交接性" class="headerlink" title="提高可交接性"></a>提高可交接性</h3><p>项目中途换人、补人、跨团队协作时，spec 是最快的上下文恢复工具之一。</p>
+<h3 id="让验收更客观"><a href="#让验收更客观" class="headerlink" title="让验收更客观"></a>让验收更客观</h3><p>做得好不好，不再只靠感觉，而是回到一开始约定好的目标、范围和标准。</p>
+<h2 id="一份轻量-spec-的推荐结构"><a href="#一份轻量-spec-的推荐结构" class="headerlink" title="一份轻量 spec 的推荐结构"></a>一份轻量 spec 的推荐结构</h2><p>如果你也想在日常项目里开始用 spec，不必一上来就写得很复杂。下面这个结构，已经足够覆盖多数中小型需求：</p>
+<figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 需求名称</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 背景</span></span><br><span class="line">为什么做这件事？</span><br><span class="line"></span><br><span class="line"><span class="section">## 目标</span></span><br><span class="line">这次最重要的结果是什么？</span><br><span class="line"></span><br><span class="line"><span class="section">## 范围</span></span><br><span class="line">包含什么，不包含什么？</span><br><span class="line"></span><br><span class="line"><span class="section">## 用户流程</span></span><br><span class="line">用户会经历哪些关键步骤？</span><br><span class="line"></span><br><span class="line"><span class="section">## 规则与边界</span></span><br><span class="line">异常情况、限制条件、兼容规则是什么？</span><br><span class="line"></span><br><span class="line"><span class="section">## 验收标准</span></span><br><span class="line">做到什么程度才算完成？</span><br></pre></td></tr></table></figure>
 
-<div class="panel panel-info">
-    <div class="panel-title"><i class="fa fa-info"></i>调整内容</div>
-    <div class="panel-body">
-        <p>可以通过修改 <code>source/_data/linklist.yml</code> 文件中的内容来调整这里的内容。</p>
-<p>具体的使用方法可以参见 文档站 中的 <a target="_blank" rel="noopener" href="https://wiki.krt.moe/posts/tag-widgets/#%E9%93%BE%E6%8E%A5%E5%88%97%E8%A1%A8-LinkList">标签组件</a> 和 <a target="_blank" rel="noopener" href="https://wiki.krt.moe/posts/linklist/">链接列表</a> 部分。</p>
-
-    </div>
-    </div>
+<p>这个模板最大的好处，是它不会把团队拖进“文档负担”，但又足够支撑一次稳定交付。</p>
+<h2 id="什么时候不需要-spec"><a href="#什么时候不需要-spec" class="headerlink" title="什么时候不需要 spec"></a>什么时候不需要 spec</h2><p>当然，也不是所有任务都要写。</p>
+<p>下面这些情况，可以只做简单记录，不必单独写完整 spec：</p>
+<ul>
+<li>明确、微小、低风险的文案调整</li>
+<li>纯样式微调，且影响范围非常清楚</li>
+<li>已经在成熟流程中反复执行的标准化任务</li>
+</ul>
+<p>如果一件事改完之后几乎不会引发误解，也不会带来协作成本，那就没必要把流程做重。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p><code>spec</code> 真正解决的，从来不是“有没有文档”这么简单，而是“大家是不是在做同一件事”。</p>
+<p>当一个需求还很模糊时，团队最需要的往往不是立刻开始做，而是先用一份足够清楚的 spec，把目标、范围、流程和验收标准对齐。这样后面的设计、开发、测试和发布，才会真正变得顺畅。</p>
+<p>如果把项目推进比作出发旅行，那么 spec 就不是额外的负担，而是出发前那张真正能避免迷路的地图。</p>
 </div>
         </div>
         
@@ -294,12 +402,34 @@
                 </div>
             
             <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/tags/Spec/" rel="tag">Spec</a>, <a class="tag-none-link" href="/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/" rel="tag">工作流</a>, <a class="tag-none-link" href="/tags/%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90/" rel="tag">需求分析</a>, <a class="tag-none-link" href="/tags/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" rel="tag">项目管理</a>
+                </div>
                 <div class="pull-date">
-                    <time datetime="2026-07-06T14:31:17.889Z" itemprop="dateModified">最后编辑：2026-07-06</time>
+                    <time datetime="2026-07-06T14:31:17.882Z" itemprop="dateModified">最后编辑：2026-07-06</time>
                 </div>
             </div>
         </footer>
     </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" 你好，世界！" href="/posts/hello-world/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" 再谈 Harness Engineering：真正拉开差距的不是提示词，而是整套控制系统" href="/posts/harness-engineering-02/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+        <div class="comment-post">
+            
+        </div>
     
 </article>
 
@@ -353,6 +483,18 @@
 </aside>
             
                     <div class="sticky-area">
+                
+                    <aside id="krw-toc" class="widget widget-kratos-toc clearfix toc-div-class" >
+    <div class="photo-background"></div>
+    <h4 class="widget-title no-after">
+        <i class="fa fa-compass"></i>
+        文章目录
+        <span class="toc-progress-bar" role="progressbar" aria-label="阅读进度："></span>
+    </h4>
+    <div class="textwidget">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%80%82%E5%90%88%E5%86%99%E6%88%90-spec-%E7%9A%84%E9%9C%80%E6%B1%82"><span class="toc-text">什么是适合写成 spec 的需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%A3%8E%E6%A0%BC%E7%9A%84%E4%BD%BF%E7%94%A8%E7%94%A8%E4%BE%8B"><span class="toc-text">一个真实风格的使用用例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E7%AF%87-spec-%E5%8F%AF%E4%BB%A5%E6%80%8E%E4%B9%88%E5%86%99"><span class="toc-text">这篇 spec 可以怎么写</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%83%8C%E6%99%AF%E4%B8%8E%E7%9B%AE%E6%A0%87"><span class="toc-text">1. 背景与目标</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%8C%83%E5%9B%B4"><span class="toc-text">2. 范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%94%A8%E6%88%B7%E6%B5%81%E7%A8%8B"><span class="toc-text">3. 用户流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%A7%84%E5%88%99%E4%B8%8E%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B6"><span class="toc-text">4. 规则与边界条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E9%AA%8C%E6%94%B6%E6%A0%87%E5%87%86"><span class="toc-text">5. 验收标准</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#spec-%E5%9C%A8%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C%E9%87%8C%E7%9A%84%E5%AE%9E%E9%99%85%E4%BB%B7%E5%80%BC"><span class="toc-text">spec 在团队协作里的实际价值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%8D%E4%BD%8E%E6%B2%9F%E9%80%9A%E6%8D%9F%E8%80%97"><span class="toc-text">降低沟通损耗</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%99%8D%E4%BD%8E%E8%BF%94%E5%B7%A5%E6%A6%82%E7%8E%87"><span class="toc-text">降低返工概率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E9%AB%98%E5%8F%AF%E4%BA%A4%E6%8E%A5%E6%80%A7"><span class="toc-text">提高可交接性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A9%E9%AA%8C%E6%94%B6%E6%9B%B4%E5%AE%A2%E8%A7%82"><span class="toc-text">让验收更客观</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BB%BD%E8%BD%BB%E9%87%8F-spec-%E7%9A%84%E6%8E%A8%E8%8D%90%E7%BB%93%E6%9E%84"><span class="toc-text">一份轻量 spec 的推荐结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%B8%8D%E9%9C%80%E8%A6%81-spec"><span class="toc-text">什么时候不需要 spec</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-text">最后</span></a></li></ol>
+    </div>
+</aside>
                 
                 
   <aside id="krw-categories" class="widget widget-kratos-categories clearfix">
