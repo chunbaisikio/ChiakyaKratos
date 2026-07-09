@@ -7,6 +7,7 @@ tags:
 - 绝妖星乱舞
 - 固定队
 - 通关记录
+cover: /assets/posts/ff14/cover.png
 comments: true
 toc: true
 donate: false
