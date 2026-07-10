@@ -143,7 +143,56 @@ visit_count:
 
 ################## 额外的注入代码 ##################
 additional_injections:
-  head: "" # 搜索引擎验证，或是追加的样式表
+  head: |
+    <style>
+      @media (min-width: 992px) {
+        .container {
+          width: min(1360px, calc(100vw - 72px));
+        }
+
+        #kratos-blog-post {
+          padding: 32px 0;
+        }
+
+        .kratos-hentry,
+        .navigation div,
+        #kratos-widget-area .widget,
+        .kr-comments {
+          border-radius: 18px;
+          box-shadow: 0 14px 40px rgba(20, 20, 20, 0.08);
+        }
+
+        .kratos-page-inner {
+          padding: 10px 14px 18px;
+        }
+
+        .kratos-page-content.kr-post,
+        .kratos-page-content.kr-page,
+        .kratos-page-content.kr-index {
+          font-size: 19px;
+          line-height: 1.95;
+        }
+
+        .kratos-page-header .kratos-page-title,
+        .index-post .kratos-page-title {
+          font-size: 42px !important;
+        }
+      }
+
+      .kratos-post-cover {
+        margin: 24px 0 30px;
+        overflow: hidden;
+        border-radius: 20px;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+      }
+
+      .kratos-post-cover img {
+        display: block;
+        width: 100%;
+        max-height: 460px;
+        object-fit: cover;
+      }
+    </style>
   footer: "" # 注入到页面主体的内容，例如额外的可见组件
   after_footer: "" # 站点分析，或是追加的脚本
   tools: "" # 注入到页面右下角浮动工具栏里的功能按钮
