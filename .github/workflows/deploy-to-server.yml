@@ -1,12 +1,22 @@
-name: Build, Publish, and Deploy
+name: Build and Deploy
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - '.github/workflows/deploy-to-server.yml'
+      - '_config.yml'
+      - '_config.kratos-rebirth.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'scaffolds/**'
+      - 'source/**'
+      - 'layout/**'
+      - 'tools/**'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: build-publish-deploy-main
@@ -21,6 +31,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -47,16 +59,6 @@ jobs:
           wc -c public/index.html
           head -n 5 public/index.html
 
-      - name: Publish static files to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./public
-          enable_jekyll: false
-          force_orphan: false
-          commit_message: "deploy: publish from ${{ github.sha }}"
-
       - name: Create deployment archive
         run: tar -czf site-static.tar.gz -C public .
 
@@ -70,7 +72,7 @@ jobs:
           source: site-static.tar.gz
           target: /tmp/chiakya-gh-pages-39016/
 
-      - name: Deploy archive and restart service
+      - name: Deploy archive on server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.GH_PAGES_SERVER_HOST }}
@@ -91,43 +93,47 @@ jobs:
 
             mkdir -p "$release_dir"
             tar -xzf "$archive_path" -C "$release_dir"
+            find "$release_dir" -type f -exec chmod 644 {} \;
+            find "$release_dir" -type d -exec chmod 755 {} \;
             ln -sfn "$release_dir" "$current_link"
 
             if command -v systemctl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
-              printf '%s\n' \
-                '[Unit]' \
-                'Description=Chiakya gh-pages static site on port 39016' \
-                'After=network.target' \
-                '' \
-                '[Service]' \
-                'Type=simple' \
-                "WorkingDirectory=$current_link" \
-                "ExecStart=/usr/bin/python3 -m http.server 39016 --bind 0.0.0.0 --directory $current_link" \
-                'Restart=always' \
-                'RestartSec=3' \
-                'User=root' \
-                '' \
-                '[Install]' \
-                'WantedBy=multi-user.target' \
-                > "$service_file"
+              if [ ! -f "$service_file" ]; then
+                printf '%s\n' \
+                  '[Unit]' \
+                  'Description=Chiakya static site on port 39016' \
+                  'After=network.target' \
+                  '' \
+                  '[Service]' \
+                  'Type=simple' \
+                  "WorkingDirectory=$current_link" \
+                  "ExecStart=/usr/bin/python3 -m http.server 39016 --bind 0.0.0.0 --directory $current_link" \
+                  'Restart=always' \
+                  'RestartSec=3' \
+                  'User=root' \
+                  '' \
+                  '[Install]' \
+                  'WantedBy=multi-user.target' \
+                  > "$service_file"
 
-              systemctl daemon-reload
-              systemctl enable "$service_name"
-              systemctl restart "$service_name"
-              systemctl --no-pager --full status "$service_name" | head -n 20 || true
+                systemctl daemon-reload
+                systemctl enable "$service_name"
+                systemctl start "$service_name"
+              elif ! systemctl is-active --quiet "$service_name"; then
+                systemctl start "$service_name"
+              fi
             elif command -v python3 >/dev/null 2>&1; then
-              pkill -f "python3 -m http.server 39016" || true
-              nohup python3 -m http.server 39016 --bind 0.0.0.0 --directory "$current_link" \
-                >/var/log/${service_name}.log 2>&1 &
-              sleep 2
-              ps -ef | grep "[p]ython3 -m http.server 39016" || true
+              if ! pgrep -f "python3 -m http.server 39016" >/dev/null 2>&1; then
+                nohup python3 -m http.server 39016 --bind 0.0.0.0 --directory "$current_link" \
+                  >/var/log/${service_name}.log 2>&1 &
+                sleep 2
+              fi
             else
               echo "python3 is required on the remote server" >&2
               exit 1
             fi
 
-            find "$release_dir" -type f -exec chmod 644 {} \;
-            find "$release_dir" -type d -exec chmod 755 {} \;
             rm -rf /tmp/chiakya-gh-pages-39016
+            ls -1dt "$releases_dir"/* 2>/dev/null | tail -n +6 | xargs -r rm -rf --
 
             curl -I --max-time 10 http://127.0.0.1:39016/ || true
