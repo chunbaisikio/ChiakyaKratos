@@ -1,0 +1,107 @@
+name: Deploy gh-pages to Port 39015
+
+on:
+  push:
+    branches:
+      - gh-pages
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-gh-pages-39015
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify static site content
+        run: |
+          test -f index.html
+          ls -la
+          wc -c index.html
+
+      - name: Create deployment archive
+        run: |
+          tar \
+            --exclude=.git \
+            --exclude=.github \
+            -czf site-static.tar.gz \
+            .
+
+      - name: Upload archive to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GH_PAGES_SERVER_HOST }}
+          username: ${{ secrets.GH_PAGES_SERVER_USERNAME }}
+          password: ${{ secrets.GH_PAGES_SERVER_PASSWORD }}
+          port: ${{ secrets.GH_PAGES_SERVER_SSH_PORT || '22' }}
+          source: site-static.tar.gz
+          target: /tmp/chiakya-gh-pages-39015/
+
+      - name: Deploy archive and restart service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GH_PAGES_SERVER_HOST }}
+          username: ${{ secrets.GH_PAGES_SERVER_USERNAME }}
+          password: ${{ secrets.GH_PAGES_SERVER_PASSWORD }}
+          port: ${{ secrets.GH_PAGES_SERVER_SSH_PORT || '22' }}
+          script: |
+            set -eu
+
+            app_root="/opt/chiakya-gh-pages-39015"
+            releases_dir="$app_root/releases"
+            current_link="$app_root/current"
+            service_name="chiakya-gh-pages-39015"
+            service_file="/etc/systemd/system/${service_name}.service"
+            archive_path="/tmp/chiakya-gh-pages-39015/site-static.tar.gz"
+            release_id="$(date +%Y%m%d%H%M%S)"
+            release_dir="$releases_dir/$release_id"
+
+            mkdir -p "$release_dir"
+            tar -xzf "$archive_path" -C "$release_dir"
+            ln -sfn "$release_dir" "$current_link"
+
+            if command -v systemctl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+              printf '%s\n' \
+                '[Unit]' \
+                'Description=Chiakya gh-pages static site on port 39015' \
+                'After=network.target' \
+                '' \
+                '[Service]' \
+                'Type=simple' \
+                "WorkingDirectory=$current_link" \
+                "ExecStart=/usr/bin/python3 -m http.server 39015 --bind 0.0.0.0 --directory $current_link" \
+                'Restart=always' \
+                'RestartSec=3' \
+                'User=root' \
+                '' \
+                '[Install]' \
+                'WantedBy=multi-user.target' \
+                > "$service_file"
+
+              systemctl daemon-reload
+              systemctl enable "$service_name"
+              systemctl restart "$service_name"
+              systemctl --no-pager --full status "$service_name" | head -n 20 || true
+            elif command -v python3 >/dev/null 2>&1; then
+              pkill -f "python3 -m http.server 39015" || true
+              nohup python3 -m http.server 39015 --bind 0.0.0.0 --directory "$current_link" \
+                >/var/log/${service_name}.log 2>&1 &
+              sleep 2
+              ps -ef | grep "[p]ython3 -m http.server 39015" || true
+            else
+              echo "python3 is required on the remote server" >&2
+              exit 1
+            fi
+
+            find "$release_dir" -type f -exec chmod 644 {} \;
+            find "$release_dir" -type d -exec chmod 755 {} \;
+            rm -rf /tmp/chiakya-gh-pages-39015
+
+            curl -I --max-time 10 http://127.0.0.1:39015/ || true
