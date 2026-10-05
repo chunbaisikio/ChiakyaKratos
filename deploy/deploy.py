@@ -120,7 +120,7 @@ class Server:
     def __init__(self, app, node):
         self.app, self.node = app, node
         self.env = load_environment(app / 'shared/site.env')
-        self.env.update(PATH=str(node.parent) + ':/usr/local/bin:/usr/bin:/bin',
+        self.env.update(PATH=str(node.parent) + ':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
                         ASTRO_TELEMETRY_DISABLED='1')
         self.origin = 'http://127.0.0.1:' + self.env['PORT']
 
