@@ -1,0 +1,30 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { allPosts, taxonomyUrl } from "../../lib/posts";
+export async function getStaticPaths() {
+  return [
+    { params: { taxonomy: "tags" } },
+    { params: { taxonomy: "categories" } },
+  ];
+}
+const kind = Astro.params.taxonomy as "tags" | "categories";
+const posts = await allPosts();
+const names = [...new Set(posts.flatMap((post) => post.data[kind]))];
+const title = kind === "tags" ? "文章标签" : "文章分类";
+---
+
+<SiteLayout title={title}>
+  <section class="page-intro">
+    <p class="eyebrow">EXPLORE THE JOURNAL</p>
+    <h1>{title}</h1>
+    <p>从一个关键词，找到更多相关的记录。</p>
+    <div class="filter-links">
+      {names.map((name) => (
+        <a href={taxonomyUrl(kind, name)}>
+          {name} ·{" "}
+          {posts.filter((post) => post.data[kind].includes(name)).length}
+        </a>
+      ))}
+    </div>
+  </section>
+</SiteLayout>

@@ -1,0 +1,49 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import PostCard from "../../components/PostCard.astro";
+import { allPosts, isFF14 } from "../../lib/posts";
+const posts = (await allPosts()).filter(isFF14);
+---
+
+<SiteLayout title="艾欧泽亚">
+  <section class="page-intro">
+    <p class="eyebrow">LET'S GO ON AN ADVENTURE</p>
+    <h1>FF14</h1>
+    <p>攻略、资源、复盘，还有一些值得记住的共同经历。</p>
+  </section>
+  <section class="ff14-banner">
+    <div>
+      <span class="eyebrow">FF14 OOPSIE LOG</span>
+      <h2>固定队复盘工具</h2>
+      <p>
+        每支队伍都有自己的工作区。犯错记录、成员管理、副本模板、CSV
+        导出与复盘草稿，在同一个地方完成。
+      </p>
+      <a class="button button-primary" href="/ff14/oopsie/">
+        进入工作区 ↗
+      </a>
+      <a
+        class="text-link"
+        href="/ff14/admin/"
+        style="display:inline-block;margin:20px"
+      >
+        FF14 模块管理 ↗
+      </a>
+    </div>
+    <div class="ff14-banner-art" aria-hidden="true">
+      <span>XIV</span>
+      <small>ONE MORE PULL.</small>
+    </div>
+  </section>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">STORIES & RESOURCES</p>
+      <h2>冒险手记</h2>
+    </div>
+  </div>
+  <section class="post-grid blog-grid">
+    {posts.map((post) => (
+      <PostCard post={post} />
+    ))}
+  </section>
+</SiteLayout>

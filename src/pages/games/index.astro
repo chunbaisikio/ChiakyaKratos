@@ -1,0 +1,34 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import GameCards from "../../components/GameCards.astro";
+import { publicGameProfiles } from "../../lib/games";
+const profiles = publicGameProfiles();
+---
+
+<SiteLayout
+  title="游戏名片"
+  description="Chiakya 的游戏主页、角色与收藏。也许我们会在某个世界里遇见。"
+>
+  <section class="page-intro game-intro">
+    <p class="eyebrow">MEET ME IN ANOTHER WORLD</p>
+    <h1>游戏名片</h1>
+    <p>游戏账号、角色与图鉴。</p>
+  </section>
+  {profiles.length ? (
+    <GameCards profiles={profiles} />
+  ) : (
+    <div class="album-empty">
+      <span aria-hidden="true">✦</span>
+      <h2>还没有公开的游戏名片</h2>
+      <p>保存并发布后，名片会显示在这里。</p>
+    </div>
+  )}
+  <section class="game-page-footer">
+    <a href="/ff14/">
+      读读艾欧泽亚的故事 <span aria-hidden="true">→</span>
+    </a>
+    <a href="/photos/">
+      看看游戏之外的日常 <span aria-hidden="true">→</span>
+    </a>
+  </section>
+</SiteLayout>

@@ -1,0 +1,22 @@
+services:
+  site:
+    build:
+      context: .
+      args:
+        SITE_URL: ${SITE_URL:-http://localhost:3001}
+    restart: unless-stopped
+    init: true
+    ports:
+      - "127.0.0.1:${PORT:-3001}:3001"
+    environment:
+      SITE_URL: ${SITE_URL:-http://localhost:3001}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    volumes:
+      - database:/data
+      - content:/app/source
+      - releases:/app/.releases
+
+volumes:
+  database:
+  content:
+  releases:

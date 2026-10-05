@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import sqlite3 from 'sqlite3';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { once } from 'node:events';
+const directory = mkdtempSync(join(tmpdir(), 'chiakya-migration-'));
+process.env.DB_PATH = join(directory, 'legacy.db'); process.env.PORT = '0'; process.env.HOST = '127.0.0.1';
+const legacy = new sqlite3.Database(process.env.DB_PATH);
+const execute = (sql, params = []) => new Promise((resolve, reject) => legacy.run(sql, params, error => error ? reject(error) : resolve()));
+await execute('CREATE TABLE users(id TEXT PRIMARY KEY,display_name TEXT NOT NULL,passcode TEXT NOT NULL UNIQUE,created_at TEXT NOT NULL)');
+await execute("INSERT INTO users VALUES ('legacy-user','旧管理员','OLD-PASSCODE','2026-01-01')");
+await execute('CREATE TABLE workspaces(id TEXT PRIMARY KEY,name TEXT NOT NULL,invite_code TEXT NOT NULL UNIQUE,created_by TEXT NOT NULL,created_at TEXT NOT NULL)');
+await execute("INSERT INTO workspaces VALUES ('legacy-workspace','旧空间','OLD-CODE','旧管理员','2026-01-01')");
+await execute('CREATE TABLE workspace_memberships(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL,user_id TEXT NOT NULL,role TEXT NOT NULL,joined_at TEXT NOT NULL,UNIQUE(workspace_id,user_id))');
+await execute("INSERT INTO workspace_memberships VALUES ('legacy-membership','legacy-workspace','legacy-user','admin','2026-01-01')");
+await execute('CREATE TABLE workspace_store(workspace_id TEXT NOT NULL,key TEXT NOT NULL,value TEXT,updated_by TEXT,updated_at TEXT NOT NULL,PRIMARY KEY(workspace_id,key))');
+await execute('INSERT INTO workspace_store VALUES (?,?,?,?,?)', ['legacy-workspace', 'ff14oopsie-v2-storage:legacy-workspace', JSON.stringify({ state: { teams: [{ id: 'old-team', name: '旧队伍', players: [] }], mistakes: [], bossProfiles: [], progress: [], activeTeamId: 'old-team' } }), 'OLD-PASSCODE', '2026-01-01']);
+await new Promise(resolve => legacy.close(resolve));
+const { server, db } = await import('../server/server.js');
+if (!server.listening) await once(server, 'listening');
+const origin = `http://127.0.0.1:${server.address().port}`;
+try {
+  const response = await fetch(origin + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ passcode: 'OLD-PASSCODE' }) });
+  assert.equal(response.status, 200); const { session } = await response.json(); assert.equal(session.userId, 'legacy-user'); assert.equal(session.workspaceId, 'legacy-workspace'); assert.ok(!('passcode' in session));
+  const cookie = response.headers.get('set-cookie').split(';')[0];
+  const data = await (await fetch(origin + '/api/store?workspaceId=legacy-workspace&key=ff14oopsie-v2-storage:legacy-workspace', { headers: { Cookie: cookie } })).json();
+  assert.equal(data.value.state.teams[0].id, 'old-team'); assert.equal(data.revision, 0);
+  const row = await new Promise((resolve, reject) => db.get("SELECT passcode,passcode_lookup FROM users WHERE id='legacy-user'", (error, row) => error ? reject(error) : resolve(row)));
+  assert.match(row.passcode, /^scrypt\$/); assert.notEqual(row.passcode_lookup, 'OLD-PASSCODE');
+  const audit = await new Promise((resolve, reject) => db.get('SELECT updated_by FROM workspace_store', (error, row) => error ? reject(error) : resolve(row)));
+  assert.equal(audit.updated_by, 'legacy-user');
+  console.log('[ok] legacy credentials, workspace IDs and records migrate without loss');
+} finally { await new Promise(resolve => server.close(resolve)); await new Promise(resolve => db.close(resolve)); rmSync(directory, { recursive: true, force: true }); }

@@ -1,0 +1,121 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { publicAlbums, albumCover, albumUrl } from "../../lib/albums";
+import { dateLabel } from "../../lib/posts";
+const albums = await publicAlbums();
+const count = albums.reduce((sum, album) => sum + album.data.photos.length, 0);
+---
+
+<SiteLayout
+  title="相册与随记"
+  description="把旅途的风景和日常的小事，留在照片与文字里。"
+>
+  <section class="page-intro album-intro">
+    <p class="eyebrow">POSTCARDS FROM MY DAYS</p>
+    <h1>相册与随记</h1>
+    <p>出行的照片，和平时的随记。</p>
+    <span class="album-count">
+      {albums.length} 本相册 · {count} 张照片
+    </span>
+  </section>
+  <div class="album-filters" role="group" aria-label="相册分类">
+    <button type="button" data-filter="all" aria-pressed="true">
+      全部
+    </button>
+    <button type="button" data-filter="travel" aria-pressed="false">
+      旅行
+    </button>
+    <button type="button" data-filter="daily" aria-pressed="false">
+      日常随记
+    </button>
+  </div>
+  {albums.length ? (
+    <>
+      <section class="album-grid" aria-label="相册列表">
+        {albums.map((album) => {
+          const cover = albumCover(album);
+          return (
+            <a
+              class="album-card"
+              href={albumUrl(album)}
+              data-kind={album.data.kind}
+            >
+              <div class="album-card-image">
+                {cover ? (
+                  <img
+                    src={cover.thumbnail}
+                    alt={cover.alt || album.data.title}
+                    width={cover.width}
+                    height={cover.height}
+                    loading="lazy"
+                  />
+                ) : (
+                  <span class="album-note-cover">a little note.</span>
+                )}
+                <span class="album-photo-count">
+                  {album.data.photos.length
+                    ? `${album.data.photos.length} 张照片`
+                    : "一段随记"}
+                </span>
+              </div>
+              <div class="album-card-body">
+                <div class="post-meta">
+                  <span class="category-label">
+                    {album.data.kind === "travel" ? "旅行" : "日常随记"}
+                  </span>
+                  <time datetime={album.data.date.toISOString()}>
+                    {dateLabel(album.data.date)}
+                  </time>
+                </div>
+                <h2>{album.data.title}</h2>
+                {album.data.description && <p>{album.data.description}</p>}
+                <div class="album-location">
+                  <span>{album.data.location || "生活的某一处"}</span>
+                  <span aria-hidden="true">↗</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </section>
+      <p class="album-filter-empty" hidden>
+        这个分类还没有公开的相册。
+      </p>
+    </>
+  ) : (
+    <div class="album-empty">
+      <span aria-hidden="true">✧</span>
+      <h2>还没有公开的相册</h2>
+      <p>
+        照片与随记会慢慢出现在这里。
+        <br />
+        你可以在内容后台新建相册，上传照片并写下故事。
+      </p>
+      <a class="button button-quiet" href="/admin/#/albums">
+        管理我的相册 ↗
+      </a>
+    </div>
+  )}
+</SiteLayout>
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>(
+    ".album-filters button",
+  );
+  const cards = document.querySelectorAll<HTMLElement>(".album-card");
+  buttons.forEach((button) =>
+    button.addEventListener("click", () => {
+      buttons.forEach((item) =>
+        item.setAttribute("aria-pressed", String(item === button)),
+      );
+      let visible = 0;
+      cards.forEach((card) => {
+        card.hidden =
+          button.dataset.filter !== "all" &&
+          card.dataset.kind !== button.dataset.filter;
+        if (!card.hidden) visible++;
+      });
+      const empty = document.querySelector<HTMLElement>(".album-filter-empty");
+      if (empty) empty.hidden = visible > 0;
+    }),
+  );
+</script>

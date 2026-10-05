@@ -1,0 +1,165 @@
+---
+import { render } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { publicAlbums, albumUrl } from "../../lib/albums";
+import {
+  allPosts,
+  postUrl,
+  dateLabel,
+  excerpt,
+  isFF14,
+  taxonomyUrl,
+} from "../../lib/posts";
+export async function getStaticPaths() {
+  return (await allPosts()).map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const toc = headings.filter(
+  (heading) => heading.depth === 2 || heading.depth === 3,
+);
+const related = (await allPosts())
+  .filter(
+    (item) =>
+      item.id !== post.id &&
+      item.data.tags.some((tag) => post.data.tags.includes(tag)),
+  )
+  .slice(0, 3);
+const readingTime = Math.max(1, Math.ceil((post.body?.length || 0) / 500));
+const albums = (await publicAlbums()).filter(album => album.data.postSlug === post.id);
+const structured = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  datePublished: post.data.date.toISOString(),
+  ...(post.data.updated
+    ? { dateModified: post.data.updated.toISOString() }
+    : {}),
+  author: { "@type": "Person", name: "Chiakya" },
+  mainEntityOfPage: new URL(postUrl(post), Astro.site).href,
+};
+---
+
+<SiteLayout
+  title={post.data.title}
+  description={excerpt(post, 160)}
+  image={post.data.cover}
+  article
+>
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(structured).replaceAll("<", "\\u003c")}
+  />
+  <header class="article-header">
+    <a class="text-link" href="/blog/">
+      ← 回到文章列表
+    </a>
+    <div class="post-meta">
+      {post.data.categories.map((name) => (
+        <a class="category-label" href={taxonomyUrl("categories", name)}>
+          {name}
+        </a>
+      ))}
+      <time datetime={post.data.date.toISOString()}>
+        {dateLabel(post.data.date)}
+      </time>
+      <span>约 {readingTime} 分钟</span>
+    </div>
+    <h1>{post.data.title}</h1>
+    <div class="article-byline">
+      <span class="brand-dot"></span> Chiakya <span>记录与分享</span>
+    </div>
+  </header>
+  {post.data.cover && (
+    <div class="article-cover">
+      <img
+        src={post.data.cover}
+        alt={post.data.title}
+        width="1400"
+        height="600"
+      />
+    </div>
+  )}
+  {post.data.template && (
+    <div class="article-template">
+      <a class="button button-primary" href={post.data.template} download>
+        下载配套副本模板 ↗
+      </a>
+      <p class="muted">在 Oopsie Log 的副本管理中导入，即可用于自己的队伍。</p>
+    </div>
+  )}
+  <div class="article-layout">
+    <article class="prose">
+      <Content />
+      <footer class="article-end">
+        {albums.length > 0 && <div class="article-albums"><span class="eyebrow">PHOTOS FROM THE STORY</span>{albums.map(album => <a class="text-link" href={albumUrl(album)}>查看相册：{album.data.title} ↗</a>)}</div>}
+        <p>谢谢你读到这里。</p>
+        <div class="filter-links">
+          {post.data.tags.map((tag) => (
+            <a href={taxonomyUrl("tags", tag)}>#{tag}</a>
+          ))}
+        </div>
+        <button class="button button-quiet" id="copy-link" type="button">
+          复制文章链接 ↗
+        </button>
+        <span id="copy-status" role="status"></span>
+      </footer>
+    </article>
+    <aside class="article-sidebar">
+      {toc.length > 0 && (
+        <nav class="toc" aria-label="文章目录">
+          <p class="eyebrow">ON THIS PAGE</p>
+          {toc.map((heading) => (
+            <a
+              class:list={{ "toc-nested": heading.depth === 3 }}
+              href={`#${heading.slug}`}
+            >
+              {heading.text}
+            </a>
+          ))}
+        </nav>
+      )}
+      {isFF14(post) && (
+        <div class="companion-card">
+          <span class="eyebrow">CONTINUE THE ADVENTURE</span>
+          <h3>把故事里的开荒，变成可复盘的记录。</h3>
+          <p>副本模板、犯错记录和队伍进度，都在你的独立工作区。</p>
+          <a class="text-link" href="/ff14/oopsie/">
+            打开 Oopsie Log ↗
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+  {related.length > 0 && (
+    <section class="related-posts">
+      <div class="section-heading">
+        <h2>接着读读</h2>
+      </div>
+      {related.map((item) => (
+        <a class="archive-row" href={postUrl(item)}>
+          <span>{item.data.title}</span>
+          <time>{dateLabel(item.data.date)}</time>
+          <span aria-hidden="true">↗</span>
+        </a>
+      ))}
+    </section>
+  )}
+  <script>
+    document
+      .getElementById("copy-link")
+      ?.addEventListener("click", async () => {
+        const status = document.getElementById("copy-status");
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          if (status) status.textContent = "链接已复制";
+        } catch {
+          if (status) status.textContent = "请从地址栏复制链接";
+        }
+      });
+  </script>
+</SiteLayout>
