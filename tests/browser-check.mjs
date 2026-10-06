@@ -713,7 +713,18 @@ try {
     .getByRole("button", { name: "选择照片 favicon.png", exact: true })
     .click();
   await page.getByRole("button", { name: "使用所选照片", exact: true }).click();
+  // Exercise a delayed response so assertions wait for the rendered preview,
+  // rather than depending on the runner's response/render scheduling.
+  await page.route(
+    "**/api/site/preview",
+    async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      await route.continue();
+    },
+    { times: 1 },
+  );
   await page.getByRole("button", { name: "预览正文", exact: true }).click();
+  await page.locator(".editor-preview img").waitFor();
   assert.equal(await page.locator(".editor-preview img").count(), 1);
   await page.getByLabel("保留为草稿").uncheck();
   await page.getByRole("button", { name: "保存文章", exact: true }).click();
