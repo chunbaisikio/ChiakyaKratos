@@ -34,6 +34,7 @@ jobs:
         with:
           name: page-screenshots
           path: .qa
+          include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 7
   deploy:

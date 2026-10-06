@@ -818,6 +818,12 @@ try {
     (await publicGames.request.get(origin + privateAvatar)).status(),
     200,
   );
+  // A real user activates this tab and accepts clipboard access. Headless
+  // Chromium must receive the same focus and origin-scoped permission.
+  await publicGames.bringToFront();
+  await publicGames
+    .context()
+    .grantPermissions(["clipboard-read", "clipboard-write"], { origin });
   await publicGames
     .getByRole("button", { name: "复制可扩展游戏验收的UID", exact: true })
     .click();
@@ -825,6 +831,10 @@ try {
     .getByRole("status")
     .getByText("已复制，可以去游戏里找我了。", { exact: true })
     .waitFor();
+  assert.equal(
+    await publicGames.evaluate(() => navigator.clipboard.readText()),
+    "PRIVATE-GAME-ID",
+  );
   await publicGames.screenshot({
     path: join(artifacts, "games-desktop.png"),
     fullPage: true,
