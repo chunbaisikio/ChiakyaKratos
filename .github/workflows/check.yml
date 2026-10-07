@@ -1,7 +1,7 @@
 name: Check and Deploy Chiakya Home
 on:
   push:
-    branches: [main, feat/chiakya-home-unified]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -43,7 +43,7 @@ jobs:
     if: >-
       github.repository == 'chunbaisikio/ChiakyaKratos' &&
       github.event_name != 'pull_request' &&
-      (github.ref == 'refs/heads/feat/chiakya-home-unified' || github.ref == 'refs/heads/main')
+      github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:

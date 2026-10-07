@@ -2,23 +2,44 @@
 
 一个项目维护个人博客、相册与随记、游戏名片、站点后台、FF14 模块后台和固定队复盘。公开页面使用 Astro，三个后台/工作区入口使用 React + TypeScript，API 使用 Express + SQLite。根目录统一安装依赖、开发、构建和验证，无需再检出或安装另一个仓库。
 
-代码以已部署的 `20261005-moe-v1` 为基线整合，当前线上运行单项目版本 `20261005-single-v1`。整合过程和旧目录对应关系见 [项目整合记录](docs/PROJECT_INTEGRATION.md)。原账号、API、后台权限和工作区数据格式保持兼容。
+`main` 是完整项目的开发基线和生产部署分支，保留原博客提交历史。线上入口为 <http://111.228.35.242:39016/>；实际部署版本记录在服务器 `current/deployment.json`，与 GitHub Actions 的提交和运行记录对应。原账号、API、后台权限和工作区数据格式保持兼容。
+
+| 文档                                        | 内容                                           |
+| ------------------------------------------- | ---------------------------------------------- |
+| [自动部署](deploy/AUTOMATIC_DEPLOYMENT.md)  | 分支策略、CI、部署凭据、升级与代码回退         |
+| [服务器与备份](deploy/SERVER_DEPLOYMENT.md) | 线上入口、持久化目录、服务管理、备份命令与历史 |
+| [数据兼容](docs/DATA_COMPATIBILITY.md)      | 账号迁移、数据库密钥、工作区与内容持久化约定   |
+| [项目整合](docs/PROJECT_INTEGRATION.md)     | 原两个项目的目录对应、整合及验收记录           |
 
 ## 开始开发
 
-使用 Node.js 24，或 Node.js 22.19 及以上。在本目录执行：
+使用 Node.js 24，或 Node.js 22.19 及以上。首次检出：
+
+```sh
+git clone --branch main https://github.com/chunbaisikio/ChiakyaKratos.git ChiakyaHome
+cd ChiakyaHome
+npm ci
+```
+
+创建本地配置（已有 `.env` 时保留它），然后启动。Windows PowerShell：
 
 ```powershell
-npm ci
-Copy-Item .env.example .env
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+npm run dev
+```
+
+Linux / macOS：
+
+```sh
+test -f .env || cp .env.example .env
 npm run dev
 ```
 
 打开 <http://127.0.0.1:4321/>。该命令启动 Astro、三个 Vite 开发入口和 API，公开页面及管理入口通过 Astro 转发，统一从 4321 访问。API 监听 3001，三个 Vite 分别监听 5173、5174、5175，退出时关闭子进程。
 
-端口被占用时，在 `.env` 中调整 `PORT`（API）、`DEV_PORT`（公开站）、`DEV_WORKSPACE_PORT`、`DEV_SITE_ADMIN_PORT` 或 `DEV_FF14_ADMIN_PORT`，各模块代理同步使用配置。当前这台开发机器的 3001 已被占用，可将 `PORT` 改为 `31001`；开发页面仍从 4321 进入。生产访问地址应与 `SITE_URL` 一致。
+端口被占用时，在 `.env` 中调整 `PORT`（API）、`DEV_PORT`（公开站）、`DEV_WORKSPACE_PORT`、`DEV_SITE_ADMIN_PORT` 或 `DEV_FF14_ADMIN_PORT`，五个端口必须不同，各模块代理同步使用配置。例如将 `PORT=31001`、`SITE_URL=http://localhost:31001`，开发页面仍从 4321 进入。生产访问地址应与 `SITE_URL` 一致。
 
-本地默认使用 `server/data.db`，不附带生产数据库或密钥。首次进入管理入口可初始化开发管理员；继续开发时原数据库会保留。需要验证旧数据时使用备份副本，不要把开发服务连接到线上实时库。
+本地默认使用 `server/data.db`，不附带生产数据库或密钥。首次打开 `/admin/`，在“初始化管理员”中填写站点名称、管理员显示名和至少 8 位口令，创建的账号同时拥有站点编辑和 FF14 管理权限。已有管理员时只显示登录与邀请入口，使用原口令登录；没有统一默认口令。继续开发时原数据库会保留。需要验证旧数据时使用备份副本，不要把开发服务连接到线上实时库。
 
 ## 目录与常用命令
 
@@ -106,17 +127,20 @@ ChiakyaHome/
 
 `.env` 由运行脚本加载，不提交到 Git：
 
-| 配置                    | 用途                                                          |
-| ----------------------- | ------------------------------------------------------------- |
-| `SITE_URL`              | 正式域名，影响 canonical、Atom 和 sitemap；修改后需要重新构建 |
-| `HOST` / `PORT`         | Node 监听地址与端口；默认 `127.0.0.1:3001`                    |
-| `DB_PATH`               | SQLite 文件；默认 `server/data.db`                            |
-| `COOKIE_SECURE`         | 本地 HTTP 为 `false`；正式 HTTPS 为 `true`                    |
-| `LEGACY_BLOG_DIST_PATH` | 可选，只读的旧博客公开目录；保留新站未覆盖的旧资源和地址      |
+| 配置                                                                 | 用途                                                                                    |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `SITE_URL`                                                           | 正式域名，影响 canonical、Atom 和 sitemap；修改后需要重新构建                           |
+| `HOST` / `PORT`                                                      | Node 监听地址与端口；默认 `127.0.0.1:3001`                                              |
+| `DB_PATH`                                                            | SQLite 文件；默认 `server/data.db`                                                      |
+| `COOKIE_SECURE`                                                      | 本地 HTTP 为 `false`；正式 HTTPS 为 `true`                                              |
+| `AUTH_LOOKUP_SECRET`                                                 | 可选，至少 32 字符；已有数据库必须沿用原值。未设置时自动使用数据库旁的 `.auth-key` 文件 |
+| `DEV_PORT`                                                           | Astro 开发入口，默认 `4321`                                                             |
+| `DEV_WORKSPACE_PORT` / `DEV_SITE_ADMIN_PORT` / `DEV_FF14_ADMIN_PORT` | 三个 Vite 开发端口，默认 `5173` / `5174` / `5175`                                       |
+| `LEGACY_BLOG_DIST_PATH`                                              | 可选，只读的旧博客公开目录；保留新站未覆盖的旧资源和地址                                |
 
 旧数据库首次启动自动增加表和列、迁移口令哈希，保留用户 ID、工作区和业务记录。旧登录缓存会要求重新登录，原口令仍可使用。协作保存增加 `baseRevision`；旧前端不能继续向新接口写入，应与服务端一起更新。
 
-迁移前停服备份原数据库。升级后备份数据库及同目录的 `data.db.auth-key`，还要备份 `source/` 和 `.releases/`；停止服务后复制，避免遗漏 SQLite WAL 的内容。如设置 `AUTH_LOOKUP_SECRET`，必须保存原密钥；换密钥会导致登录索引失效。数据库密钥丢失或不匹配时服务会拒绝启动。
+迁移前备份原数据库。升级后应一起备份数据库及同目录的 `data.db.auth-key`、完整 `source/`、`.releases/` 和环境配置。数据库通过 SQLite 备份接口复制，包含 WAL 中已提交的记录；仅复制运行中的 `data.db` 不足以保证完整。可执行命令见 [日常备份](deploy/SERVER_DEPLOYMENT.md#日常备份)。如设置 `AUTH_LOOKUP_SECRET`，必须保存原密钥；换密钥会导致登录索引失效。数据库密钥丢失或不匹配时服务会拒绝启动。
 
 协作发生冲突或断网时会停止上传，保留当前本地修改并提供备份下载；重新同步读取服务端最新版本。当前没有自动合并两个人的编辑。仅支持单个 Node 实例。历史发布保存在 `.releases/`，尚未自动清理；定期备份并维护磁盘空间。
 
@@ -137,9 +161,15 @@ docker compose up -d --build
 
 Docker 的构建上下文是本项目，数据库、内容和发布版本分别使用持久卷。已有服务器采用新目录时，继续使用原 `shared/data`、`shared/source` 和 `shared/publications`，不要用开发初始文件覆盖持久化内容。具体路径、服务工作目录变化和回退方法见 [项目整合记录](docs/PROJECT_INTEGRATION.md)；历史部署与备份见 [远端部署记录](deploy/SERVER_DEPLOYMENT.md)。
 
-代码保存在原 `chunbaisikio/ChiakyaKratos` 仓库的 `feat/chiakya-home-unified` 分支，根目录即整合项目。后续开发从该分支开始：`git clone -b feat/chiakya-home-unified https://github.com/chunbaisikio/ChiakyaKratos.git`。
+后续开发从最新 `main` 创建功能分支：
 
-推送该分支会执行检查、接口测试、部署回退测试、构建与浏览器验收，通过后自动更新现有服务器。PR 仅检查；合并到 `main` 后，同一流程也适用于 `main`。服务器先用独立数据库和内容副本验证，切换时备份并读取最新持久化内容；升级失败回退代码和公开版本，保留实时数据库、密钥和上传内容。具体凭据、运行记录及手动回退见 [自动部署](deploy/AUTOMATIC_DEPLOYMENT.md)。
+```sh
+git switch main
+git pull --ff-only origin main
+git switch -c feat/your-feature
+```
+
+提交功能后推送分支、创建目标为 `main` 的 PR。PR 执行检查、接口测试、部署回退测试、构建与浏览器验收；合并到 `main` 后再次检查，通过后自动更新现有服务器。功能分支不部署生产，避免旧整合分支覆盖线上版本；Actions 手动部署也只接受 `main`。服务器先用独立数据库和内容副本验证，切换时备份并读取最新持久化内容；升级失败回退代码和公开版本，保留实时数据库、密钥和上传内容。具体凭据、运行记录及手动回退见 [自动部署](deploy/AUTOMATIC_DEPLOYMENT.md)。
 
 ## 验证与数据兼容
 
@@ -150,3 +180,19 @@ npm run verify
 浏览器检查使用临时数据库和内容副本，覆盖桌面/手机、搜索、日历、相册、游戏名片、独立后台、权限、草稿附件隔离、发布和失败回退，不修改实际内容和工作区。Windows 自动使用已安装的 Chrome / Edge；其他环境先运行 `npx playwright install chromium`，或通过 `BROWSER_EXECUTABLE` 指定浏览器。截图写入忽略提交的 `.qa/`。
 
 服务端迁移、工作区快照、个人偏好、数据库密钥和内容持久化的约定见 [数据兼容说明](docs/DATA_COMPATIBILITY.md)。
+
+部署脚本另外使用 `python3 -m unittest discover -s deploy/tests -v` 验证切换失败回退和数据保留，CI 会执行；Windows 可使用 `python`，部分符号链接测试可能因系统权限跳过。
+
+## 常见问题
+
+| 现象                                   | 处理                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 本地没有网页                           | 开发运行 `npm run dev` 后访问 4321；生产方式先构建，再 `npm start` 并访问配置的 `PORT`。同时检查终端启动日志 |
+| `EADDRINUSE` / 端口占用                | 修改 `.env` 中对应端口，停止旧进程后重新启动；开发的五个端口必须互不重复                                     |
+| 登录成功但无法进入某个后台             | 检查对应的站点编辑、FF14 管理或队伍成员权限；登录成功不代表拥有全部管理权限                                  |
+| 保存文章、相册或名片后公开页面没有变化 | 保存只更新内容库；取消草稿或启用名片展示后，再点击“更新公开页面”                                             |
+| SQLite 报 `GLIBC_*` 或原生模块加载错误 | Linux 安装 Python 3、make、g++ 和对应 Node 头文件，再执行 `npm ci`；安装脚本会按需本机编译                   |
+| 浏览器测试找不到浏览器                 | 执行 `npx playwright install chromium`；Linux CI 使用 `--with-deps`，也可设置 `BROWSER_EXECUTABLE`           |
+| 数据库登录密钥缺失或不匹配             | 恢复该数据库配套的 `.auth-key` 或原 `AUTH_LOOKUP_SECRET`，不能通过重新生成密钥修复旧账号                     |
+
+提交前检查 `git status`，数据库、密钥、`.env`、上传内容、构建产物和 `.qa/` 均不应纳入提交。仓库 `source/` 是初始内容，线上内容由持久化目录与备份管理。

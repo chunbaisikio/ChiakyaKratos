@@ -10,7 +10,11 @@
 
 2026-10-05 已更新到前端改版 `20261005-moe-v1`。参考 [绮凛的网站](https://moe.best/) 的紫色顶栏、头像侧栏、插画背景和紧凑文章列表，用本站已有图片重新设计首页、文章、相册、游戏页及两个后台和复盘工作区。默认浅色，保留手动明暗切换；手机导航默认收起。此次只调整前端，服务端代码、账号口令和业务结构保持一致；上线时使用最新持久化内容重新发布，并验证全部内容文件及工作区快照的哈希一致。
 
-2026-10-05 已部署整合后的单项目 `20261005-single-v1`，这是当前运行版本。根目录统一依赖、开发、构建、测试和服务启动；systemd 工作目录改为 `/www/wwwroot/chiakya_home/current`。数据库、内容和发布版本继续使用原持久化目录，不用本地初始内容覆盖。先在隔离副本上验证原账号、权限及两次连续发布，再切换服务和公开版本。切换前后业务快照、身份与邀请关系、18 个内容文件和登录密钥核对一致。
+2026-10-05 首次部署整合后的单项目 `20261005-single-v1`。根目录统一依赖、开发、构建、测试和服务启动；systemd 工作目录改为 `/www/wwwroot/chiakya_home/current`。数据库、内容和发布版本继续使用原持久化目录，不用本地初始内容覆盖。先在隔离副本上验证原账号、权限及两次连续发布，再切换服务和公开版本。切换前后业务快照、身份与邀请关系、18 个内容文件和登录密钥核对一致。
+
+2026-10-06 首次 GitHub Actions 自动部署通过：[运行 37417441668](https://github.com/chunbaisikio/ChiakyaKratos/actions/runs/37417441668)，提交 `b7c5922`，版本 `ci-37417441668-1-b7c5922e3961`。回归核对原账号、5 篇文章、397 条犯错记录、18 个内容文件和登录密钥保留，切换备份在 `backups/ci-37417441668-1-b7c5922e3961`。
+
+2026-10-07 整合项目纳入 `main`，后续仅 `main` 通过检查后自动部署。当前实际版本读取 `current/deployment.json`，不以本文的历史版本号判断。
 
 ## 入口与管理
 
@@ -29,15 +33,15 @@
 
 主目录为 `/www/wwwroot/chiakya_home`：
 
-| 路径                           | 用途                                                 |
-| ------------------------------ | ---------------------------------------------------- |
-| `current`                      | 当前代码版本链接，指向 `releases/20261005-single-v1` |
-| `shared/data/data.db`          | 迁移后的实时 SQLite 数据库                           |
-| `shared/data/data.db.auth-key` | 登录密钥，必须与数据库配套备份                       |
-| `shared/source`                | 文章、追番数据、相册、图片目录与上传资源             |
-| `shared/publications`          | CMS 发布版本和 `current.json` 指针                   |
-| `shared/site.env`              | 端口、站点地址和数据库路径；仅 root 可读             |
-| `backups`                      | 迁移前后备份，仅 root 可访问                         |
+| 路径                           | 用途                                         |
+| ------------------------------ | -------------------------------------------- |
+| `current`                      | 当前代码版本链接，指向 `releases/<部署版本>` |
+| `shared/data/data.db`          | 迁移后的实时 SQLite 数据库                   |
+| `shared/data/data.db.auth-key` | 登录密钥，必须与数据库配套备份               |
+| `shared/source`                | 文章、追番数据、相册、图片目录与上传资源     |
+| `shared/publications`          | CMS 发布版本和 `current.json` 指针           |
+| `shared/site.env`              | 端口、站点地址和数据库路径；仅 root 可读     |
+| `backups`                      | 迁移前后备份，仅 root 可访问                 |
 
 当前版本直接在根目录包含 `src`、`apps/console`、`server`、`tools` 和一份 npm 锁文件。根目录的 `source` 和 `.releases` 分别链接到 `shared/source` 和 `shared/publications`，升级代码不会覆盖后台新增内容；运行时从 `shared/site.env` 读取原配置。
 
@@ -46,6 +50,16 @@
 站点接口为 `/api/site/*`，FF14 模块管理接口为 `/api/ff14/admin/*`，旧 API 别名保留。站点与模块后台只恢复身份，不初始化队伍快照。历史管理员的站点编辑权限通过 `app_settings` 中的 `migration.site-editor-roles.v1` 一次性初始化，后续重启不会恢复已撤销的站点权限。本次只增加迁移标记，不更改业务数据结构。
 
 服务为 `chiakya-home.service`，以 `www` 运行，已启用开机启动。日志通过 `journalctl -u chiakya-home.service` 查看。服务配置模板见同目录 `chiakya-home.service.example`；兼容端口配置见 `chiakya-home-39015.conf.example`。
+
+SSH 登录后查看当前服务和部署版本：
+
+```sh
+systemctl status chiakya-home.service --no-pager
+journalctl -u chiakya-home.service -n 100 --no-pager
+readlink -f /www/wwwroot/chiakya_home/current
+cat /www/wwwroot/chiakya_home/current/deployment.json
+curl --fail http://127.0.0.1:39016/api/health
+```
 
 旧 `ff14-oopsie-dev`、`chiakya-gh-pages-39016`、`chiakya-gh-pages-39015` 服务已停止并取消开机启动，文件和旧数据目录保留。历史 39015 静态博客服务原先不断重试占用 FF14 端口，此次一并停用。
 
@@ -101,7 +115,7 @@ trap - EXIT
 
 ## 后续更新与回退
 
-后续推送 `feat/chiakya-home-unified` 自动检查及升级，流程、触发范围与回退见 [自动部署](AUTOMATIC_DEPLOYMENT.md)。新代码放入独立版本目录，在项目根目录按锁文件安装全部依赖，复制已有内容与数据库在本机验证，再备份并切换 `current` 和重启服务。不要将仓库内的初始 `source` 覆盖到 `shared/source`。三个 React 入口与 API 必须一起更新，内容后台始终保留构建依赖。
+后续功能分支通过 PR 合入 `main`，由 `main` 自动检查及升级，流程、触发范围与回退见 [自动部署](AUTOMATIC_DEPLOYMENT.md)。新代码放入独立版本目录，在项目根目录按锁文件安装全部依赖，复制已有内容与数据库在本机验证，再备份并切换 `current` 和重启服务。不要将仓库内的初始 `source` 覆盖到 `shared/source`。三个 React 入口与 API 必须一起更新，内容后台始终保留构建依赖。
 
 回退到历史双目录版本时，将 `current` 指向原版本，并同时恢复相应备份中的 systemd 服务文件（其工作目录为 `current/ChiakyaKratos`），执行 `systemctl daemon-reload` 后重启。回退单项目版本时使用根目录工作目录。代码回退始终保留实时数据库、登录密钥和完整内容。
 

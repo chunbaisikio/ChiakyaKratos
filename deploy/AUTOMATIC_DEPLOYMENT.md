@@ -1,10 +1,12 @@
 # 自动部署
 
-仓库为 <https://github.com/chunbaisikio/ChiakyaKratos>，当前开发及部署分支为 `feat/chiakya-home-unified`。该分支保留原博客提交历史，根目录包含完整整合项目。`main` 暂保留旧版本；后续整合分支合入 `main` 时，新工作流会替换旧静态博客部署。
+仓库为 <https://github.com/chunbaisikio/ChiakyaKratos>，`main` 为完整整合项目和生产部署分支，保留原博客提交历史。原 `feat/chiakya-home-unified` 是整合过程的历史分支，后续开发从最新 `main` 创建功能分支，通过 PR 合回 `main`。
 
 ## 触发与检查
 
-推送整合分支自动触发 `.github/workflows/check.yml`：Node 24 按锁文件安装，执行类型检查、全部站点/React/API 测试、Python 部署回退测试、三个管理入口和站点构建，以及 Playwright 浏览器验收。全部通过后自动部署。PR 不部署；合并至 `main` 后推送 `main` 也部署。工作流在默认分支可用后，可在 Actions 中手动运行。
+推送 `main` 自动触发 [.github/workflows/check.yml](../.github/workflows/check.yml)：Node 24 按锁文件安装，执行类型检查、全部站点/React/API 测试、Python 部署回退测试、三个管理入口和站点构建，以及 Playwright 浏览器验收。全部通过后自动部署。PR 只检查；功能分支普通推送不触发生产部署。手动运行时选择 `main` 才会部署，选择其他分支只执行检查。
+
+在仓库 [Actions](https://github.com/chunbaisikio/ChiakyaKratos/actions/workflows/check.yml) 查看 `check` 与 `Deploy production` 两个任务。浏览器截图作为 `page-screenshots` 附件保留 7 天。排查失败先查看失败步骤；手动重新运行时部署版本中的 attempt 会递增，旧运行和备份仍保留。
 
 检查按分支取消旧任务；生产部署单独排队，不取消已经开始的切换。过时提交在部署前跳过；服务器另有 `shared/deploy.lock` 防止并行升级。提交 SHA 和 Actions run ID、attempt 共同构成版本目录名，便于定位代码与流水线。
 
@@ -12,12 +14,12 @@
 
 复用仓库原部署工作流引用的 Actions secrets：
 
-| Secret | 用途 |
-| --- | --- |
-| `GH_PAGES_SERVER_HOST` | 当前服务器 `111.228.35.242` |
+| Secret                     | 用途                                            |
+| -------------------------- | ----------------------------------------------- |
+| `GH_PAGES_SERVER_HOST`     | 当前服务器 `111.228.35.242`                     |
 | `GH_PAGES_SERVER_USERNAME` | 原部署账号，需要管理现有 systemd 服务与备份目录 |
-| `GH_PAGES_SERVER_PASSWORD` | SSH 登录口令，仅通过进程环境提供给 sshpass |
-| `GH_PAGES_SERVER_SSH_PORT` | 可选，默认 `22` |
+| `GH_PAGES_SERVER_PASSWORD` | SSH 登录口令，仅通过进程环境提供给 sshpass      |
+| `GH_PAGES_SERVER_SSH_PORT` | 可选，默认 `22`                                 |
 
 仓库不保存服务器口令、环境配置、数据库或登录密钥。`deploy/known_hosts` 保存已核实的公开 SSH 主机密钥，连接要求严格匹配。端口变化时需同步 known_hosts 的主机格式；主机密钥变化时先独立核实再修改。
 
