@@ -1,0 +1,378 @@
+---
+import siteStyles from "../styles/site.css?url";
+import themeStyles from "../styles/theme.css?url";
+import {
+  allPosts,
+  dateLabel,
+  postUrl,
+  taxonomyUrl,
+  isFF14,
+} from "../lib/posts";
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  article?: boolean;
+}
+const {
+  title,
+  description = "竹竹的博客，记录技术、FF14 和日常。",
+  image = "/assets/Lolita.webp",
+  article = false,
+} = Astro.props;
+const pageTitle = title ? `${title} · Chiakya` : "Chiakya · 竹竹的博客";
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const posts = await allPosts();
+const categories = [...new Set(posts.flatMap((post) => post.data.categories))];
+const nav = [
+  { href: "/", label: "首页", icon: "m3 10 9-7 9 7v10H3Zm6 10v-7h6v7" },
+  {
+    href: "/blog/",
+    label: "文章",
+    icon: "M5 3h10l4 4v14H5Zm9 0v5h5M8 12h8M8 16h6",
+  },
+  {
+    href: "/photos/",
+    label: "相册",
+    icon: "M3 7h5l2-3h4l2 3h5v13H3ZM16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+  },
+  {
+    href: "/games/",
+    label: "游戏",
+    icon: "M7 8h10l4 9-2 3-5-4h-4l-5 4-2-3ZM7 10v5M5 12.5h4M16 11h1M18 14h1",
+  },
+  {
+    href: "/ff14/",
+    label: "FF14",
+    icon: "m5 3 16 16-2 2L3 5V3ZM13 7l6-4h2v2l-4 6M8 16l-5 5M6 14l4 4",
+  },
+  {
+    href: "/anime-calendar/",
+    label: "追番",
+    icon: "M3 5h18v16H3ZM7 2v6M17 2v6M3 10h18M8 14h1M15 14h1",
+  },
+];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#7266a6" />
+    <title>{pageTitle}</title>
+    <link rel="stylesheet" href={siteStyles} />
+    <link rel="stylesheet" href={themeStyles} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="Chiakya RSS"
+      href="/atom.xml"
+    />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={article ? "article" : "website"} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("chiakya-theme") || "light";
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      跳到正文
+    </a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="/" aria-label="Chiakya 首页">
+          <span aria-hidden="true">✿</span> Chiakya<small>的小窝</small>
+        </a>
+        <button
+          class="icon-button nav-toggle"
+          id="nav-toggle"
+          type="button"
+          aria-label="打开导航"
+          aria-expanded="false"
+          aria-controls="site-sidebar"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <form class="header-search" action="/search/" role="search">
+          <input
+            name="q"
+            type="search"
+            placeholder="输入关键词搜索…"
+            aria-label="站内搜索"
+          />
+          <button type="submit" aria-label="提交站内搜索">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+          </button>
+        </form>
+        <div class="header-actions">
+          <a class="header-text-link" href="/archives/">
+            归档
+          </a>
+          <a class="header-text-link" href="/links/">
+            友链
+          </a>
+          <a class="icon-button" href="/search/" aria-label="搜索文章">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+          </a>
+          <button
+            class="icon-button"
+            id="theme-toggle"
+            aria-label="切换明暗主题"
+            type="button"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z" />
+            </svg>
+          </button>
+          <a class="workspace-link" href="/manage/">
+            管理
+          </a>
+        </div>
+      </div>
+    </header>
+    <aside class="site-sidebar" id="site-sidebar">
+      <div class="sidebar-profile">
+        <a href="/" class="profile-avatar">
+          <img
+            src="/assets/Joan.webp"
+            alt="Chiakya 的头像"
+            width="96"
+            height="96"
+          />
+        </a>
+        <strong>竹竹 · Chiakya</strong>
+        <p>写代码，打副本，偶尔出门。</p>
+        <a href="/atom.xml" class="profile-rss">
+          ◔ RSS 订阅
+        </a>
+      </div>
+      <nav aria-label="主导航" class="sidebar-nav">
+        <p class="nav-group-label">导航</p>
+        {nav.map((item) => (
+          <a
+            href={item.href}
+            aria-current={
+              (
+                item.href === "/"
+                  ? Astro.url.pathname === "/"
+                  : Astro.url.pathname.startsWith(item.href)
+              )
+                ? "page"
+                : undefined
+            }
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d={item.icon} />
+            </svg>
+            <span>{item.label}</span>
+          </a>
+        ))}
+        <p class="nav-group-label">博客</p>
+        <a href="/archives/">
+          <span class="nav-symbol" aria-hidden="true">
+            ▦
+          </span>
+          文章归档
+        </a>
+        <a href="/categories/">
+          <span class="nav-symbol" aria-hidden="true">
+            ◇
+          </span>
+          文章分类
+        </a>
+        <a href="/tags/">
+          <span class="nav-symbol" aria-hidden="true">
+            ♧
+          </span>
+          标签
+        </a>
+        <a href="/links/">
+          <span class="nav-symbol" aria-hidden="true">
+            ↗
+          </span>
+          友情链接
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="/manage/">管理入口</a>
+        <span>记录一点自己的日常。</span>
+      </div>
+    </aside>
+    <button
+      class="sidebar-scrim"
+      id="sidebar-scrim"
+      type="button"
+      aria-label="关闭导航"
+      hidden
+    ></button>
+    <div class:list={["site-frame", { "article-frame": article }]}>
+      <main id="main" class="site-main">
+        <slot />
+      </main>
+      {!article && (
+        <aside class="site-rail" aria-label="博客侧栏">
+          <section class="rail-section">
+            <h2>最近的文章</h2>
+            {posts.slice(0, 4).map((post) => (
+              <a class="rail-post" href={postUrl(post)}>
+                <img
+                  src={post.data.cover || "/assets/Joan.webp"}
+                  alt=""
+                  width="38"
+                  height="38"
+                  loading="lazy"
+                />
+                <span>
+                  {post.data.title}
+                  <small>{dateLabel(post.data.date)}</small>
+                </span>
+              </a>
+            ))}
+          </section>
+          <section class="rail-section">
+            <h2>博客信息</h2>
+            <dl class="rail-info">
+              <div>
+                <dt>文章</dt>
+                <dd>{posts.length} 篇</dd>
+              </div>
+              <div>
+                <dt>FF14 手记</dt>
+                <dd>{posts.filter(isFF14).length} 篇</dd>
+              </div>
+              <div>
+                <dt>最近更新</dt>
+                <dd>{posts[0] ? dateLabel(posts[0].data.date) : "暂无"}</dd>
+              </div>
+            </dl>
+          </section>
+          <section class="rail-section">
+            <h2>分类</h2>
+            <div class="rail-categories">
+              {categories.map((name) => (
+                <a href={taxonomyUrl("categories", name)}>
+                  <span>{name}</span>
+                  <small>
+                    {
+                      posts.filter((post) =>
+                        post.data.categories.includes(name),
+                      ).length
+                    }
+                  </small>
+                </a>
+              ))}
+            </div>
+          </section>
+          <section class="rail-section rail-tools">
+            <h2>常用入口</h2>
+            <a href="/ff14/oopsie/">
+              FF14 复盘工作区 <span>↗</span>
+            </a>
+            <a href="/photos/">
+              相册与随记 <span>↗</span>
+            </a>
+            <a href="/games/">
+              游戏名片 <span>↗</span>
+            </a>
+            <a href="/anime-calendar/">
+              追番日历 <span>↗</span>
+            </a>
+          </section>
+        </aside>
+      )}
+    </div>
+    <footer class="site-footer">
+      <span>© {new Date().getFullYear()} Chiakya</span>
+      <nav aria-label="页脚导航">
+        <a href="/atom.xml">RSS</a>
+        <a href="/links/">友链</a>
+        <a href="/admin/">站点后台</a>
+      </nav>
+    </footer>
+    <script>
+      const toggle = document.getElementById("nav-toggle");
+      const scrim = document.getElementById("sidebar-scrim");
+      function closeNavigation() {
+        document.body.removeAttribute("data-nav-open");
+        toggle?.setAttribute("aria-expanded", "false");
+        if (scrim) scrim.hidden = true;
+      }
+      toggle?.addEventListener("click", () => {
+        const open = toggle.getAttribute("aria-expanded") !== "true";
+        document.body.toggleAttribute("data-nav-open", open);
+        toggle.setAttribute("aria-expanded", String(open));
+        if (scrim) scrim.hidden = !open;
+      });
+      scrim?.addEventListener("click", closeNavigation);
+      document.addEventListener("keydown", (event) => {
+        if (
+          event.key === "Escape" &&
+          document.body.hasAttribute("data-nav-open")
+        ) {
+          closeNavigation();
+          toggle?.focus();
+        }
+      });
+      document.getElementById("theme-toggle")?.addEventListener("click", () => {
+        const theme =
+          document.documentElement.dataset.theme === "light" ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+        try {
+          localStorage.setItem("chiakya-theme", theme);
+        } catch {}
+      });
+    </script>
+  </body>
+</html>

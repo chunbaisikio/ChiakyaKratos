@@ -1,0 +1,43 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { allPosts, postUrl, dateLabel } from "../../lib/posts";
+const posts = await allPosts();
+const years = [
+  ...new Set(
+    posts.map((post) =>
+      new Intl.DateTimeFormat("en", {
+        timeZone: "Asia/Shanghai",
+        year: "numeric",
+      }).format(post.data.date),
+    ),
+  ),
+];
+---
+
+<SiteLayout title="文章归档">
+  <section class="page-intro">
+    <p class="eyebrow">THE ARCHIVE</p>
+    <h1>一些时间的切片。</h1>
+    <p>{posts.length} 篇记录，按时间排列。</p>
+  </section>
+  {years.map((year) => (
+    <section class="archive-section">
+      <h2>{year}</h2>
+      {posts
+        .filter(
+          (post) =>
+            new Intl.DateTimeFormat("en", {
+              timeZone: "Asia/Shanghai",
+              year: "numeric",
+            }).format(post.data.date) === year,
+        )
+        .map((post) => (
+          <a class="archive-row" href={postUrl(post)}>
+            <time>{dateLabel(post.data.date)}</time>
+            <span>{post.data.title}</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))}
+    </section>
+  ))}
+</SiteLayout>

@@ -1,0 +1,95 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+---
+
+<SiteLayout title="搜索文章">
+  <section class="page-intro">
+    <p class="eyebrow">FIND A LITTLE SOMETHING</p>
+    <h1>寻找一段记录。</h1>
+    <p>按标题、标签或正文搜索。</p>
+  </section>
+  <form class="search-form" role="search">
+    <label class="sr-only" for="search-input">
+      搜索文章
+    </label>
+    <input
+      id="search-input"
+      name="q"
+      type="search"
+      placeholder="试试 FF14、Spec、技术…"
+      autocomplete="off"
+    />
+    <button class="button button-primary" type="submit">
+      搜索 ↗
+    </button>
+  </form>
+  <p id="search-status" class="muted" role="status"></p>
+  <div id="search-results" class="search-results"></div>
+  <noscript>
+    搜索需要启用 JavaScript。你也可以查看 <a href="/archives/">文章归档</a>。
+  </noscript>
+  <script>
+    type Entry = {
+      title: string;
+      url: string;
+      excerpt: string;
+      text: string;
+      tags: string[];
+    };
+    const input = document.getElementById("search-input") as HTMLInputElement;
+    const results = document.getElementById("search-results")!;
+    const status = document.getElementById("search-status")!;
+    let entries: Entry[] = [];
+    function search() {
+      const query = input.value.trim().toLocaleLowerCase();
+      const terms = query.split(/\s+/).filter(Boolean);
+      const matches = terms.length
+        ? entries.filter((entry) =>
+            terms.every((term) =>
+              `${entry.title} ${entry.text} ${entry.tags.join(" ")}`
+                .toLocaleLowerCase()
+                .includes(term),
+            ),
+          )
+        : [];
+      results.replaceChildren();
+      status.textContent = query
+        ? `找到 ${matches.length} 篇相关记录`
+        : "输入关键词，开始寻找。";
+      for (const entry of matches) {
+        const card = document.createElement("a");
+        card.className = "search-result";
+        card.href = entry.url;
+        const title = document.createElement("h2");
+        title.textContent = entry.title;
+        const text = document.createElement("p");
+        text.textContent = entry.excerpt;
+        card.append(title, text);
+        results.append(card);
+      }
+    }
+    input.value = new URLSearchParams(location.search).get("q") || "";
+    document.querySelector("form")?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      history.replaceState(
+        null,
+        "",
+        `${location.pathname}${input.value ? `?q=${encodeURIComponent(input.value)}` : ""}`,
+      );
+      search();
+    });
+    input.addEventListener("input", search);
+    fetch("/search-index.json")
+      .then((response) => {
+        if (!response.ok) throw new Error();
+        return response.json();
+      })
+      .then((data) => {
+        entries = data;
+        search();
+      })
+      .catch(() => {
+        status.textContent = "搜索暂时不可用，请稍后重试。";
+      });
+  </script>
+</SiteLayout>

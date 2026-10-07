@@ -1,0 +1,28 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import PostCard from "../../components/PostCard.astro";
+import { allPosts, taxonomyUrl } from "../../lib/posts";
+const posts = await allPosts();
+const categories = [...new Set(posts.flatMap((post) => post.data.categories))];
+---
+
+<SiteLayout title="文章">
+  <section class="page-intro">
+    <p class="eyebrow">THE JOURNAL</p>
+    <h1>文章</h1>
+    <p>技术笔记、游戏记录和日常。</p>
+    <div class="filter-links">
+      <a class="active" href="/blog/">
+        全部 · {posts.length}
+      </a>
+      {categories.map((name) => (
+        <a href={taxonomyUrl("categories", name)}>{name}</a>
+      ))}
+    </div>
+  </section>
+  <section class="post-grid blog-grid">
+    {posts.map((post) => (
+      <PostCard post={post} />
+    ))}
+  </section>
+</SiteLayout>

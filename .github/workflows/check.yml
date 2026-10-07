@@ -1,0 +1,103 @@
+name: Check and Deploy Chiakya Home
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: chiakya-check-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      SITE_URL: ${{ vars.SITE_URL || 'http://localhost:3001' }}
+      ASTRO_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
+      - run: python3 -m unittest discover -s deploy/tests -v
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: page-screenshots
+          path: .qa
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+  deploy:
+    name: Deploy production
+    needs: check
+    if: >-
+      github.repository == 'chunbaisikio/ChiakyaKratos' &&
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: chiakya-home-production
+      cancel-in-progress: false
+    env:
+      SERVER_HOST: ${{ secrets.GH_PAGES_SERVER_HOST }}
+      SERVER_USER: ${{ secrets.GH_PAGES_SERVER_USERNAME }}
+      SERVER_PORT: ${{ secrets.GH_PAGES_SERVER_SSH_PORT || '22' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check branch still points to this commit
+        id: latest
+        shell: bash
+        run: |
+          set -euo pipefail
+          tip=$(git ls-remote origin "$GITHUB_REF" | cut -f1)
+          if [ "$tip" = "$GITHUB_SHA" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'A newer commit is queued; skip this deployment.'
+            echo 'current=false' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Prepare code archive and SSH
+        if: steps.latest.outputs.current == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_USER"
+          test "$SERVER_HOST" = '111.228.35.242'
+          git archive --format=tar.gz --output=release.tar.gz HEAD
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sshpass
+          mkdir -p "$HOME/.ssh"
+          install -m 600 deploy/known_hosts "$HOME/.ssh/known_hosts"
+      - name: Upload and safely upgrade
+        if: steps.latest.outputs.current == 'true'
+        shell: bash
+        env:
+          SSHPASS: ${{ secrets.GH_PAGES_SERVER_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$SSHPASS"
+          release="ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA:0:12}"
+          incoming="/tmp/chiakya-home-${release}"
+          checksum=$(sha256sum release.tar.gz | cut -d' ' -f1)
+          options=(-o StrictHostKeyChecking=yes -o ConnectTimeout=20 -o ServerAliveInterval=15)
+          sshpass -e ssh "${options[@]}" -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" "umask 077; mkdir '$incoming'"
+          sshpass -e scp "${options[@]}" -P "$SERVER_PORT" release.tar.gz deploy/deploy.py "$SERVER_USER@$SERVER_HOST:$incoming/"
+          sshpass -e ssh "${options[@]}" -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" \
+            "python3 '$incoming/deploy.py' --archive '$incoming/release.tar.gz' --sha256 '$checksum' --release '$release'"
+          printf 'Deployed `%s` to http://111.228.35.242:39016/\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify public service
+        if: steps.latest.outputs.current == 'true'
+        run: |
+          curl --fail --retry 5 --retry-delay 2 --max-time 15 http://111.228.35.242:39016/api/health
+          curl --fail --max-time 15 --output /dev/null http://111.228.35.242:39016/

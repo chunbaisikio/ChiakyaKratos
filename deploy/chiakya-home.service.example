@@ -1,0 +1,24 @@
+[Unit]
+Description=Chiakya Home, blog, albums and FF14 workspace
+After=network.target
+
+[Service]
+Type=simple
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/chiakya_home/current
+EnvironmentFile=/www/wwwroot/chiakya_home/shared/site.env
+ExecStart=/www/wwwroot/ff14_oopsie_dev/shared/node/bin/node tools/serve.mjs
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/www/wwwroot/chiakya_home/shared /www/wwwroot/chiakya_home/releases
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

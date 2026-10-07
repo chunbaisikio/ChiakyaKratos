@@ -1,0 +1,142 @@
+---
+import type { GameProfile } from "../lib/games";
+interface Props {
+  profiles: GameProfile[];
+  compact?: boolean;
+}
+const { profiles, compact = false } = Astro.props;
+---
+
+<div class:list={["game-grid", { "game-grid-compact": compact }]}>
+  {profiles.map((profile) => (
+    <article
+      class="game-card"
+      data-game-card={profile.id}
+      style={`--game-accent: ${profile.accent}`}
+    >
+      <div class="game-card-top">
+        <div class="game-avatar">
+          <span aria-hidden="true">
+            {profile.emblem || profile.title.slice(0, 2)}
+          </span>
+          {profile.image && (
+            <img
+              src={profile.image}
+              alt={`${profile.title}头像`}
+              width="64"
+              height="64"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            />
+          )}
+        </div>
+        <div class="game-card-heading">
+          <span class="game-platform">{profile.title}</span>
+          <h3>
+            {profile.identity || profile.title}
+            {profile.identity && (
+              <button
+                type="button"
+                class="game-copy"
+                data-copy={profile.identity}
+                aria-label={`复制${profile.title}的昵称或角色`}
+                title="复制昵称或角色"
+              >
+                ⧉
+              </button>
+            )}
+          </h3>
+        </div>
+        <span class="game-spark" aria-hidden="true">
+          ✦
+        </span>
+      </div>
+      {profile.description && (
+        <p class="game-description">{profile.description}</p>
+      )}
+      {profile.details.length > 0 && (
+        <dl class="game-details">
+          {profile.details.map((detail) => (
+            <div>
+              <dt>{detail.label}</dt>
+              <dd>
+                <span>{detail.value}</span>
+                <button
+                  type="button"
+                  class="game-copy"
+                  data-copy={detail.value}
+                  aria-label={`复制${profile.title}的${detail.label}`}
+                  title={`复制${detail.label}`}
+                >
+                  ⧉
+                </button>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {profile.links.length > 0 && (
+        <div class="game-links">
+          {profile.links.map((link) => {
+            const external = /^https?:\/\//.test(link.url);
+            return (
+              <a
+                href={link.url}
+                target={external ? "_blank" : undefined}
+                rel={external ? "noopener noreferrer" : undefined}
+              >
+                {link.label}
+                <span aria-hidden="true">{external ? "↗" : "→"}</span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </article>
+  ))}
+</div>
+<p class="game-copy-feedback" role="status" aria-live="polite"></p>
+<script>
+  document
+    .querySelectorAll<HTMLImageElement>(".game-avatar img")
+    .forEach((image) => {
+      image.addEventListener("error", () => {
+        image.hidden = true;
+      });
+      if (image.complete && image.naturalWidth === 0) image.hidden = true;
+    });
+  document
+    .querySelectorAll<HTMLButtonElement>(".game-copy")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const text = button.dataset.copy || "";
+        const status = document.querySelector<HTMLElement>(
+          ".game-copy-feedback",
+        );
+        try {
+          if (navigator.clipboard && window.isSecureContext)
+            await navigator.clipboard.writeText(text);
+          else {
+            const field = document.createElement("textarea");
+            field.value = text;
+            field.readOnly = true;
+            field.style.cssText =
+              "position:fixed;opacity:0;pointer-events:none;left:0;top:0";
+            document.body.append(field);
+            field.select();
+            const copied = document.execCommand("copy");
+            field.remove();
+            button.focus({ preventScroll: true });
+            if (!copied) throw new Error("Copy unavailable");
+          }
+          if (status) status.textContent = "已复制，可以去游戏里找我了。";
+        } catch {
+          if (status)
+            status.textContent = "暂时无法复制，可以直接选中名片上的文字。";
+        }
+        window.setTimeout(() => {
+          if (status) status.textContent = "";
+        }, 3500);
+      });
+    });
+</script>

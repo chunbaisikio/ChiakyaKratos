@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "profiles": [
+    {
+      "id": "steam",
+      "title": "Steam",
+      "identity": "ChiakyaCoetus",
+      "description": "在游戏里，遇见另一种生活。",
+      "emblem": "S",
+      "accent": "#85b9e2",
+      "image": "https://avatars.fastly.steamstatic.com/7e10856dcf520ac61a3693380502b4d990ff8f7e_full.jpg",
+      "visible": true,
+      "details": [{ "label": "主页 ID", "value": "chun_bai" }],
+      "links": [
+        {
+          "label": "看看我的 Steam",
+          "url": "https://steamcommunity.com/id/chun_bai/"
+        }
+      ]
+    },
+    {
+      "id": "ff14",
+      "title": "最终幻想 XIV",
+      "identity": "蕾米艾尔",
+      "description": "在艾欧泽亚，留下我们并肩冒险的日子。",
+      "emblem": "XIV",
+      "accent": "#d2e9a3",
+      "image": "",
+      "visible": true,
+      "details": [{ "label": "服务器", "value": "紫水栈桥" }],
+      "links": [
+        { "label": "艾欧泽亚手记", "url": "/ff14/" },
+        { "label": "固定队工作区", "url": "/ff14/oopsie/" }
+      ]
+    },
+    {
+      "id": "hbr",
+      "title": "绯染天空",
+      "identity": "我的角色收藏",
+      "description": "把喜欢的角色与一路的养成记录收在这里。",
+      "emblem": "HBR",
+      "accent": "#d7a8ca",
+      "image": "",
+      "visible": true,
+      "details": [],
+      "links": [
+        {
+          "label": "查看收藏图鉴",
+          "url": "https://ruriro.cc/hbr/StyleChart/?s=FQuI485YW2slCuqN1L0F9EQbJOnrT0f1sjo2kX135jOWqgaDMds4ce85nr9HpZa2P0arEiYIz8lRaWNa56yu18akkKl"
+        }
+      ]
+    }
+  ]
+}

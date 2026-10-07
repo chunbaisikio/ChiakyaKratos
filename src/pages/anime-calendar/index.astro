@@ -1,0 +1,16 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import Calendar from "../../components/Calendar";
+import entries from "../../../source/anime-calendar/data.json";
+import { shanghaiDate } from "../../lib/calendar.mjs";
+---
+
+<SiteLayout title="追番日历">
+  <section class="page-intro">
+    <p class="eyebrow">A LITTLE TIME FOR STORIES</p>
+    <h1>追番日历</h1>
+    <p>正在追的番剧和剧集。点击查看详情，日期按上海时区显示。</p>
+  </section>
+  <Calendar entries={entries} initialDate={shanghaiDate()} client:load />
+  <noscript>交互日历需要启用 JavaScript。</noscript>
+</SiteLayout>

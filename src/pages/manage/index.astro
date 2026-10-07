@@ -1,0 +1,34 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+---
+
+<SiteLayout title="管理入口">
+  <section class="page-intro">
+    <p class="eyebrow">CHOOSE YOUR WORKSPACE</p>
+    <h1>管理入口</h1>
+    <p>按要处理的事情进入对应后台，登录后使用现有账号的权限。</p>
+  </section>
+  <section class="management-grid">
+    <a href="/admin/" class="management-card">
+      <span class="eyebrow">PERSONAL SITE</span>
+      <h2>站点管理</h2>
+      <p>文章、相册与随记、图片库、游戏名片和内容发布。</p>
+      <small>站点内容编辑者</small>
+      <strong>进入站点后台 ↗</strong>
+    </a>
+    <a href="/ff14/oopsie/" class="management-card">
+      <span class="eyebrow">TEAM WORKSPACE</span>
+      <h2>FF14 复盘工作区</h2>
+      <p>日常犯错记录、记录明细、复盘手记、副本、队伍和本队成员。</p>
+      <small>固定队队长与成员</small>
+      <strong>进入复盘工作区 ↗</strong>
+    </a>
+    <a href="/ff14/admin/" class="management-card">
+      <span class="eyebrow">FF14 ADMINISTRATION</span>
+      <h2>FF14 模块管理</h2>
+      <p>队长邀请码、队长工作区名单和跨队副本进度。</p>
+      <small>FF14 模块管理员</small>
+      <strong>进入 FF14 管理后台 ↗</strong>
+    </a>
+  </section>
+</SiteLayout>

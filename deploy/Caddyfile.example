@@ -1,0 +1,5 @@
+# Replace example.com with your domain. Run Caddy on the same server as Node.
+example.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:3001
+}

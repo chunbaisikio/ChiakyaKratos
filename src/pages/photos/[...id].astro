@@ -1,0 +1,59 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import PhotoGallery from "../../components/PhotoGallery";
+import { publicAlbums, albumCover } from "../../lib/albums";
+import { allPosts, dateLabel, postUrl } from "../../lib/posts";
+export async function getStaticPaths() {
+  return (await publicAlbums()).map((album) => ({
+    params: { id: album.id },
+    props: { album },
+  }));
+}
+const { album } = Astro.props;
+const cover = albumCover(album);
+const post = (await allPosts()).find((post) => post.id === album.data.postSlug);
+---
+
+<SiteLayout
+  title={album.data.title}
+  description={
+    album.data.description || album.data.note.slice(0, 160) || "照片与随记"
+  }
+  image={cover?.url}
+>
+  <header class="album-detail-header">
+    <a class="text-link" href="/photos/">
+      ← 回到相册
+    </a>
+    <div class="post-meta">
+      <span class="category-label">
+        {album.data.kind === "travel" ? "旅行" : "日常随记"}
+      </span>
+      <time datetime={album.data.date.toISOString()}>
+        {dateLabel(album.data.date)}
+      </time>
+      {album.data.location && <span>{album.data.location}</span>}
+    </div>
+    <h1>{album.data.title}</h1>
+    {album.data.description && (
+      <p class="album-description">{album.data.description}</p>
+    )}
+    <span class="album-count">{album.data.photos.length} 张照片 · Chiakya</span>
+  </header>
+  {album.data.note && (
+    <section class="album-journal" aria-label="相册随记">
+      <p class="eyebrow">A NOTE TO REMEMBER</p>
+      <p>{album.data.note}</p>
+    </section>
+  )}
+  {album.data.photos.length > 0 && (
+    <PhotoGallery photos={album.data.photos} client:load />
+  )}
+  {post && (
+    <a class="album-related companion-card" href={postUrl(post)}>
+      <span class="eyebrow">THE STORY CONTINUES</span>
+      <h2>{post.data.title} ↗</h2>
+      <p>在文章里，继续读这一段故事。</p>
+    </a>
+  )}
+</SiteLayout>

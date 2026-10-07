@@ -1,6 +1,6 @@
 ---
 title: 再谈 Harness Engineering：真正拉开差距的不是提示词，而是整套控制系统
-date: 2026-03-30 21:10:00
+date: '2026-03-30T21:10:00+08:00'
 categories: 技术随笔
 tags:
 - Harness Engineering

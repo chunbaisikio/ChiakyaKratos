@@ -1,0 +1,67 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import { allPosts } from "../lib/posts";
+import GameCards from "../components/GameCards.astro";
+import { publicGameProfiles } from "../lib/games";
+const games = publicGameProfiles();
+const posts = await allPosts();
+const featured = [
+  ...posts.filter((post) => post.data.cover),
+  ...posts.filter((post) => !post.data.cover),
+].slice(0, 2);
+const latest = posts.filter(
+  (post) => !featured.some((item) => item.id === post.id),
+);
+---
+
+<SiteLayout>
+  <section class="home-cover">
+    <img
+      src="/assets/Lolita.webp"
+      alt="樱花树下的伙伴们"
+      width="1200"
+      height="871"
+      fetchpriority="high"
+    />
+    <div>
+      <h1>Chiakya 的小窝</h1>
+      <p>技术 · 游戏 · 日常</p>
+      <small>这里是竹竹，欢迎来串门。</small>
+    </div>
+  </section>
+  <p class="home-notice">
+    <span aria-hidden="true">♧</span> 写点技术，记点游戏，也存一些照片。
+  </p>
+  {featured.length > 0 && (
+    <section class="home-featured" aria-label="推荐文章">
+      {featured.map((post) => (
+        <PostCard post={post} featured />
+      ))}
+    </section>
+  )}
+  <section class="home-journal">
+    <div class="section-heading">
+      <h2>最近更新</h2>
+      <a class="text-link" href="/blog/">
+        全部文章 →
+      </a>
+    </div>
+    <div class="post-grid">
+      {latest.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+  </section>
+  {games.length > 0 && (
+    <section class="home-games" aria-labelledby="home-games-title">
+      <div class="section-heading">
+        <h2 id="home-games-title">游戏名片</h2>
+        <a class="text-link" href="/games/">
+          查看全部 →
+        </a>
+      </div>
+      <GameCards profiles={games.slice(0, 3)} compact />
+    </section>
+  )}
+</SiteLayout>
